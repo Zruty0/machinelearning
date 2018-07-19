@@ -462,9 +462,19 @@ namespace Microsoft.ML.Runtime.Data
             return
                 (ref VBuffer<Float> dst) =>
                 {
+                    // Pete: this is the reverse key-to-index code.
                     getSrc(ref src);
                     if (src == 0 || src > size)
                     {
+                        // Special handling for a zero: a missing value is mapped to a one-hot array of all zeroes.
+                        
+                        // Another case (src > size) is there to cover the pathological case, where a value of the key
+                        // is bigger than KeyCount. For properly constructed keys this is never the case, but if you abuse
+                        // the system, you still shouldn't cause IndexOutOfRange. Instead, these erroneous cases are treated
+                        // the same way as missing values.
+
+                        // Probably similar to having an enum of 3 values carry the underlying integer value of 5: allowed by
+                        // the runtime, but doesn't make sense.
                         dst = new VBuffer<Float>(size, 0, dst.Values, dst.Indices);
                         return;
                     }

@@ -891,6 +891,8 @@ namespace Microsoft.ML.Runtime.Internal.Utilities
         // REVIEW: n-argument versions? The multi-column re-application problem?
         // Think about how to address these.
 
+        // Pete: getter codegen (and a bunch of other codegen) happens via this framework. You might want to look
+        // at the concrete example (annotated in NADropTransform), this will make the general example clearer.
         /// <summary>
         /// Given a generic method with a single type parameter, re-create the generic method on a new type,
         /// then reinvoke the method and return the result. A common pattern throughout the code base is to

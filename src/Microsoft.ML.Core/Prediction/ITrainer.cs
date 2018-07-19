@@ -16,6 +16,9 @@ namespace Microsoft.ML.Runtime
     /// </summary>
     public delegate void SignatureTrainer();
 
+    // Pete: this is one example of 'marker interfaces' I found. 
+    // We use these parameterless delegates to group different trainer into categories. 
+    // Note that one trainer can be part of multiple categories.
     public delegate void SignatureBinaryClassifierTrainer();
     public delegate void SignatureMultiClassClassifierTrainer();
     public delegate void SignatureRegressorTrainer();

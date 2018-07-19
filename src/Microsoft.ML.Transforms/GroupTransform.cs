@@ -448,8 +448,14 @@ namespace Microsoft.ML.Runtime.Data
                     Contracts.AssertValue(row);
                     var type = row.Schema.GetColumnType(col);
 
+                    // Pete: another codegen. Here we manufacture a method that will verify that a value in the 
+                    // specified column hasn't changed since the last position.
+                    // This is generic on the type of the value, known at runtime (it's type.RawType).
+                    // We start by making a 'mold' factory, that manufactures a checker<int>.
                     Func<IRow, int, Func<bool>> del = MakeSameChecker<int>;
+                    // Then we morph this factory into the one that manufactures a checker<type.RawType>.
                     var mi = del.GetMethodInfo().GetGenericMethodDefinition().MakeGenericMethod(type.RawType);
+                    // Finally, we call the factory to get the checker delegate.
                     IsSameKey = (Func<bool>)mi.Invoke(null, new object[] { row, col });
                 }
             }
@@ -473,6 +479,9 @@ namespace Microsoft.ML.Runtime.Data
                     var colType = row.Schema.GetColumnType(col);
                     Contracts.Assert(colType.IsPrimitive);
 
+                    // Pete: this is another flavor of codegen. We need to manufacture ListAggregator<colType.RowType>,
+                    // a type that's known at runtime.
+                    // We do it via the same routine, except we use MakeGenericType instead of MakeGenericMethod.
                     var type = typeof(ListAggregator<>);
 
                     var cons = type.MakeGenericType(colType.RawType).GetConstructor(new[] { typeof(IRow), typeof(int) });

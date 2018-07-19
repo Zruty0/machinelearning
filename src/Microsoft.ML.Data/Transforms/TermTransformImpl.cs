@@ -637,6 +637,10 @@ namespace Microsoft.ML.Runtime.Data
 
                 private void KeyMapper(ref DvText src, ref uint dst)
                 {
+                    // Pete: this is about handling the key type.
+                    // Note how the value of the key is either zero, if the src is 'not found', 
+                    // or 1+index if if is.
+                    // This idea of 'off by one key' is hard to remember and easy to forget.
                     var nstr = src.FindInPool(_pool);
                     if (nstr == null)
                         dst = 0;

@@ -192,13 +192,23 @@ namespace Microsoft.ML.Runtime.Data
             Host.Assert(Infos[iinfo].TypeSrc.IsVector);
 
             disposer = null;
+
+            // Pete: this is one example of getter codegen that doesn't actually call MarshalInvoke.
+            // Please follow my hands closely, as magic will happen.
+
+            // Pete: MakeVecGetter<int> is a 'template' (let's say 'mold' to disambiguate from generics).
+            // Note that this is not a getter yet. This is a getter FACTORY, it will create a getter.
             Func<IRow, int, ValueGetter<VBuffer<int>>> del = MakeVecGetter<int>;
+            // Get a generic method definition describing 'all generic methods similar to our mold'.
+            // Then manufacture a new generic method, with the correct generic type (RawType).
             var methodInfo = del.GetMethodInfo().GetGenericMethodDefinition().MakeGenericMethod(Infos[iinfo].TypeSrc.ItemType.RawType);
+            // Ok, so now methodInfo holds the reference to the 'getter factory' method we manufactured. Call it.
             return (Delegate)methodInfo.Invoke(this, new object[] { input, iinfo });
         }
 
         private ValueGetter<VBuffer<TDst>> MakeVecGetter<TDst>(IRow input, int iinfo)
         {
+            // 
             var srcGetter = GetSrcGetter<VBuffer<TDst>>(input, iinfo);
             var buffer = default(VBuffer<TDst>);
             var isNA = (RefPredicate<TDst>)_isNAs[iinfo];
@@ -271,6 +281,13 @@ namespace Microsoft.ML.Runtime.Data
 
         private void DropNAs<TDst>(ref VBuffer<TDst> src, ref VBuffer<TDst> dst, RefPredicate<TDst> isNA)
         {
+            // Pete: this is one example of how we work with VBuffers.
+            // This method will drop all slots that have NA values in them.
+            // We also know at this point that NA and default(TDst) are different (otherwise we would've used the above version).
+            // Under these conditions, our operation will be sparsity-preserving (sparse input <=> sparse output).
+            // The other version above is always densifying (any input - dense output).
+            
+            // In this method src is owned by us, and dst is owned by the caller, but we need to modify it.
             Host.AssertValue(isNA);
 
             int newCount = 0;
@@ -283,23 +300,45 @@ namespace Microsoft.ML.Runtime.Data
 
             if (newCount == 0)
             {
+                // If there are NO values that aren't NA, we drop all NAs.
+                // Which means that in dense case we will return an empty vector, and in sparse case we return 
+                // a vector containing only default values.
+
+                // Let K = src.Length - src.Count is a number of implicit default values if the vector is sparse, or zero if the vector is dense.
+                // There are no explicit default values (because they are not NA, and newCount = 0).
+                
+                // Note how we create a vector of Length=K, and Count=0. 
+                // In dense case it's zero length, zero count: an empty vector. 
+                // In sparse case it's length K, but zero explicit values (so it's K default values).
+                // In any case, dst.Values is not needed (but preserved from old dst for buffer reuse.
+                // dst.Indices is unchanged, so it's preserved.
                 dst = new VBuffer<TDst>(src.Length - src.Count, 0, dst.Values, dst.Indices);
                 return;
             }
 
             if (newCount == src.Count)
             {
+                // OK, so the new count is equal to old count. Which means that all explicitly represented values are not NAs.
+                // We also know that default <> NA, so there are just no NAs at all. Which means that we should copy src into dst
+                // with no changes.
+                // Note that we don't actually copy, but swap the buffers: now we own the old dst's buffers, and the caller will own
+                // (previously ours) src's buffers. Fancy!
                 Utils.Swap(ref src, ref dst);
                 return;
             }
 
+            // End of trivial cases. We know that we need to drop some values and preserve some values.
+
             var values = dst.Values;
+            // If the old buffer isn't large enough, we allocate a new buffer of the right size.
+            // Note that we can't check values.Length here, as it's totally legal to have values be null.
             if (Utils.Size(values) < newCount)
                 values = new TDst[newCount];
 
             int iDst = 0;
             if (src.IsDense)
             {
+                // The source is dense. Go over all values and move the NAs forward.
                 for (int i = 0; i < src.Count; i++)
                 {
                     if (!isNA(ref src.Values[i]))
@@ -309,14 +348,23 @@ namespace Microsoft.ML.Runtime.Data
                     }
                 }
                 Host.Assert(iDst == newCount);
+                // So we've shifted all values to replace NAs. Keep 'values' as the buffer (just set length to newCount).
+                // Note that the output is dense, yet we keep track of the original Indices, for possible reuse later.
                 dst = new VBuffer<TDst>(newCount, values, dst.Indices);
             }
             else
             {
+                // The source is sparse. All the implicit default values (being non-NA) need to be preserved, but
+                // their indices will now change.
+
+
                 var indices = dst.Indices;
+                // We need newCount new indices. Reallocate the indices array.
+                // Again, can't check indices.Length.
                 if (Utils.Size(indices) < newCount)
                     indices = new int[newCount];
 
+                // That's the populating loop. Move values over, and offset indices.
                 int offset = 0;
                 for (int i = 0; i < src.Count; i++)
                 {
@@ -331,6 +379,11 @@ namespace Microsoft.ML.Runtime.Data
                 }
                 Host.Assert(iDst == newCount);
                 Host.Assert(offset == src.Count - newCount);
+
+                // offset is 'number of deleted items'.
+                // The new output's length is 'old length - number of deleted items'.
+                // The new output's count is just newCount.
+                // Note how one or both of values/indices could be new or old buffers.
                 dst = new VBuffer<TDst>(src.Length - offset, newCount, values, indices);
             }
         }

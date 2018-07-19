@@ -17,6 +17,8 @@ using Microsoft.ML.Runtime.Internal.Internallearn;
 using Microsoft.ML.Runtime.Model;
 using Microsoft.ML.Runtime.Training;
 
+// Pete: marker interfaces. Note how the trainer is simultaneously a tree ensemble, a binary classifier and a 'feature scorer'.
+// These are multiple dimensions of trainer classification.
 [assembly: LoadableClass(FastForestClassification.Summary, typeof(FastForestClassification), typeof(FastForestClassification.Arguments),
     new[] { typeof(SignatureBinaryClassifierTrainer), typeof(SignatureTrainer), typeof(SignatureTreeEnsembleTrainer), typeof(SignatureFeatureScorerTrainer) },
     FastForestClassification.UserNameValue,

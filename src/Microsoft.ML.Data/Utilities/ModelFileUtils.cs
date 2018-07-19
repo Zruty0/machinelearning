@@ -286,16 +286,26 @@ namespace Microsoft.ML.Runtime.Model
                 var loader = loaderSub.CreateInstance(env,
                     new RepositoryStreamWrapper(rep, DirTrainingInfo, RoleMappingFile));
 
+                // Pete: this is one of the clearer usages of the getters.
+                // Note the c => true predicate: it tells that we do need all the columns, but we could just as well requested
+                // a subset.
                 using (var cursor = loader.GetRowCursor(c => true))
                 {
+                    // Prior to cursoring, we collect the getters we will need, and the buffers we will use.
+                    // Note that calls to GetGetter are where the type checking occurs.
                     var roleGetter = cursor.GetGetter<DvText>(0);
                     var colGetter = cursor.GetGetter<DvText>(1);
                     var role = default(DvText);
                     var col = default(DvText);
                     while (cursor.MoveNext())
                     {
+                        // The invocations of the getters don't involve typechecking or any Reflection.
+                        // It i s still a delegate call, so pretty expensive unfortunately.
                         roleGetter(ref role);
                         colGetter(ref col);
+
+                        // In this particular use case, we actually want to materialize the whole dataset in a separate
+                        // structure (list of key-value pairs), so we create a pair of strings per row.
                         string roleStr = role.ToString();
                         string colStr = col.ToString();
 

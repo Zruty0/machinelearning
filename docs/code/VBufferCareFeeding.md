@@ -1,3 +1,4 @@
+(Pete: this entire document is an entertaining read on how we work with VBuffers)
 # `VBuffer` Care and Feeding
 
 The `VBuffer` is ML.NET's central vector type, used throughout our data
@@ -244,6 +245,7 @@ detail here, but:
 ensure that the arrays are of the right size.
 
 ## Golden Rules
+(Pete: this is the time-tested short list of pitfalls around VBuffer use)
 
 Here are some golden rules to remember:
 
