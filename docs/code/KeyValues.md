@@ -1,3 +1,6 @@
+(Pete: this is a document describing our implementation of key types. It 
+covers the off-by-one idiom, and also gives a broader context of why we 
+even have the key type, and not settle with just an int)
 # Key Values
 
 Most commonly, key-values are used to encode items where it is convenient or

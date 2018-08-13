@@ -44,6 +44,8 @@ namespace Microsoft.ML.Runtime
     /// </summary>
     public interface IPredictorProducing<out TResult> : IPredictor
     {
+        // Pete: this is one notable marker interface. We don't know HOW this predictor will be producing its outputs,
+        // but we know what type they will be of. See calibrators for usage.
     }
 
     /// <summary>

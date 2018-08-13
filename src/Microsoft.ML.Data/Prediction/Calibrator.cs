@@ -136,10 +136,13 @@ namespace Microsoft.ML.Runtime.Internal.Calibration
     {
         protected readonly IHost Host;
 
+        // Pete: marker interfaces. For a base calibrator we don't know which types of predictors we're dealing with,
+        // but it definitely must be producing a float. 
         public IPredictorProducing<Float> SubPredictor { get; }
         public ICalibrator Calibrator { get; }
         public PredictionKind PredictionKind => SubPredictor.PredictionKind;
 
+        // The constructor restricts at compile time that the predictor is producing float.
         protected CalibratedPredictorBase(IHostEnvironment env, string name, IPredictorProducing<Float> predictor, ICalibrator calibrator)
         {
             Contracts.CheckValue(env, nameof(env));
@@ -232,6 +235,8 @@ namespace Microsoft.ML.Runtime.Internal.Calibration
         {
             Contracts.AssertValue(Host);
 
+            // Pete: marker interfaces. Finally, in this class we know what is our predictor. It's a value mapper.
+            // After we cast it, we finally will be able to retrieve a mapper and work with the predictions.
             _mapper = SubPredictor as IValueMapper;
             Host.Check(_mapper != null, "The predictor does not implement IValueMapper");
             Host.Check(_mapper.OutputType == NumberType.Float, "The output type of the predictor is expected to be Float");
