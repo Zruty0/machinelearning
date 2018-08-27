@@ -17,57 +17,18 @@ using Microsoft.ML.Core.Data;
 using System.Collections.Generic;
 using System.Linq;
 
-[assembly: LoadableClass(ImageLoaderTransform.Summary, typeof(IDataTransform), typeof(ImageLoaderTransformer), typeof(ImageLoaderTransform.Arguments), typeof(SignatureDataTransform),
+[assembly: LoadableClass(ImageLoaderTransform.Summary, typeof(IDataTransform), typeof(ImageLoaderTransform), typeof(ImageLoaderTransform.Arguments), typeof(SignatureDataTransform),
     ImageLoaderTransform.UserName, "ImageLoaderTransform", "ImageLoader")]
 
-[assembly: LoadableClass(ImageLoaderTransform.Summary, typeof(IDataTransform), typeof(ImageLoaderTransformer), null, typeof(SignatureLoadDataTransform),
+[assembly: LoadableClass(ImageLoaderTransform.Summary, typeof(IDataTransform), typeof(ImageLoaderTransform), null, typeof(SignatureLoadDataTransform),
    ImageLoaderTransform.UserName, ImageLoaderTransform.LoaderSignature)]
 
-[assembly: LoadableClass(typeof(ImageLoaderTransformer), null, typeof(SignatureLoadModel), "", ImageLoaderTransformer.LoaderSignature)]
+[assembly: LoadableClass(typeof(ImageLoaderTransform), null, typeof(SignatureLoadModel), "", ImageLoaderTransform.LoaderSignature)]
 
-[assembly: LoadableClass(typeof(IRowMapper), typeof(ImageLoaderTransformer.Mapper), null, typeof(SignatureLoadRowMapper), "", ImageLoaderTransformer.LoaderSignature)]
+[assembly: LoadableClass(typeof(IRowMapper), typeof(ImageLoaderTransform.Mapper), null, typeof(SignatureLoadRowMapper), "", ImageLoaderTransform.LoaderSignature)]
 
 namespace Microsoft.ML.Runtime.ImageAnalytics
 {
-    /// <summary>
-    /// Transform which takes one or many columns of type <see cref="DvText"/> and loads them as <see cref="ImageType"/>
-    /// </summary>
-    public static class ImageLoaderTransform
-    {
-        public sealed class Column : OneToOneColumn
-        {
-            public static Column Parse(string str)
-            {
-                Contracts.AssertNonEmpty(str);
-
-                var res = new Column();
-                if (res.TryParse(str))
-                    return res;
-                return null;
-            }
-
-            public bool TryUnparse(StringBuilder sb)
-            {
-                Contracts.AssertValue(sb);
-                return TryUnparseCore(sb);
-            }
-        }
-
-        public sealed class Arguments : TransformInputBase
-        {
-            [Argument(ArgumentType.Multiple | ArgumentType.Required, HelpText = "New column definition(s) (optional form: name:src)",
-                ShortName = "col", SortOrder = 1)]
-            public Column[] Column;
-
-            [Argument(ArgumentType.AtMostOnce, HelpText = "Folder where to search for images", ShortName = "folder")]
-            public string ImageFolder;
-        }
-
-        internal const string Summary = "Load images from files.";
-        internal const string UserName = "Image Loader Transform";
-        public const string LoaderSignature = "ImageLoaderTransform";
-    }
-
     public abstract class TrivialEstimator<TTransformer> : IEstimator<TTransformer>
         where TTransformer : class, ITransformer
     {
@@ -88,16 +49,16 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
         public abstract SchemaShape GetOutputSchema(SchemaShape inputSchema);
     }
 
-    public sealed class ImageLoaderEstimator : TrivialEstimator<ImageLoaderTransformer>
+    public sealed class ImageLoaderEstimator : TrivialEstimator<ImageLoaderTransform>
     {
         private readonly ImageType _imageType;
 
         public ImageLoaderEstimator(IHostEnvironment env, string imageFolder, params (string input, string output)[] columns)
-            : this(env, new ImageLoaderTransformer(env, imageFolder, columns))
+            : this(env, new ImageLoaderTransform(env, imageFolder, columns))
         {
         }
 
-        public ImageLoaderEstimator(IHostEnvironment env, ImageLoaderTransformer transformer)
+        public ImageLoaderEstimator(IHostEnvironment env, ImageLoaderTransform transformer)
             : base(Contracts.CheckRef(env, nameof(env)).Register(nameof(ImageLoaderEstimator)), transformer)
         {
             _imageType = new ImageType();
@@ -123,7 +84,10 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
         }
     }
 
-    public sealed class ImageLoaderTransformer : ITransformer, ICanSaveModel
+    /// <summary>
+    /// Transform which takes one or many columns of type <see cref="DvText"/> and loads them as <see cref="ImageType"/>
+    /// </summary>
+    public sealed class ImageLoaderTransform : ITransformer, ICanSaveModel
     {
         public sealed class Column : OneToOneColumn
         {
@@ -164,10 +128,10 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
 
         public IReadOnlyCollection<(string input, string output)> Columns => _columns.AsReadOnly();
 
-        public ImageLoaderTransformer(IHostEnvironment env, string imageFolder, params (string input, string output)[] columns)
+        public ImageLoaderTransform(IHostEnvironment env, string imageFolder, params (string input, string output)[] columns)
         {
             Contracts.CheckValue(env, nameof(env));
-            _host = env.Register(nameof(ImageLoaderTransformer));
+            _host = env.Register(nameof(ImageLoaderTransform));
             _host.CheckValueOrNull(imageFolder);
             _host.CheckValue(columns, nameof(columns));
 
@@ -185,7 +149,7 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
             _columns = columns;
         }
 
-        public static ImageLoaderTransformer Create(IHostEnvironment env, ModelLoadContext ctx)
+        public static ImageLoaderTransform Create(IHostEnvironment env, ModelLoadContext ctx)
         {
             Contracts.CheckValue(env, nameof(env));
             env.CheckValue(ctx, nameof(ctx));
@@ -193,23 +157,24 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
             ctx.CheckAtModel(GetVersionInfo());
 
             // *** Binary format ***
-            // string or null: image folder
             // int: number of added columns
             // for each added column
-            //   string: input column name
-            //   string: output column name
+            //   int: id of output column name
+            //   int: id of input column name
+            // int: id of image folder
 
-            string imageFolder = ctx.LoadStringOrNull();
             int n = ctx.Reader.ReadInt32();
             var columns = new (string input, string output)[n];
             for (int i = 0; i < n; i++)
             {
-                string input = ctx.LoadNonEmptyString();
                 string output = ctx.LoadNonEmptyString();
+                string input = ctx.LoadNonEmptyString();
                 columns[i] = (input, output);
             }
 
-            return new ImageLoaderTransformer(env, imageFolder, columns);
+            string imageFolder = ctx.LoadStringOrNull();
+
+            return new ImageLoaderTransform(env, imageFolder, columns);
         }
 
         public ISchema GetOutputSchema(ISchema inputSchema)
@@ -245,19 +210,19 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
             ctx.SetVersionInfo(GetVersionInfo());
 
             // *** Binary format ***
-            // string or null: image folder
             // int: number of added columns
             // for each added column
-            //   string: input column name
-            //   string: output column name
+            //   int: id of output column name
+            //   int: id of input column name
+            // int: id of image folder
 
-            ctx.SaveStringOrNull(imageFolder);
             ctx.Writer.Write(columns.Length);
             foreach (var (input, output) in columns)
             {
-                ctx.SaveNonEmptyString(input);
                 ctx.SaveNonEmptyString(output);
+                ctx.SaveNonEmptyString(input);
             }
+            ctx.SaveStringOrNull(imageFolder);
         }
 
         private static VersionInfo GetVersionInfo()
@@ -273,7 +238,7 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
 
         public static IDataTransform Create(IHostEnvironment env, ImageLoaderTransform.Arguments args, IDataView data)
         {
-            return new ImageLoaderTransformer(env, args.ImageFolder, args.Column.Select(x => (x.Source ?? x.Name, x.Name)).ToArray())
+            return new ImageLoaderTransform(env, args.ImageFolder, args.Column.Select(x => (x.Source ?? x.Name, x.Name)).ToArray())
                 .CreateDataTransform(data);
         }
 
@@ -321,7 +286,7 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
                 env.CheckValue(ctx, nameof(ctx));
                 env.CheckValue(schema, nameof(schema));
 
-                var xf = ImageLoaderTransformer.Create(env, ctx);
+                var xf = ImageLoaderTransform.Create(env, ctx);
                 return new Mapper(env, xf._imageFolder, xf._columns, schema);
             }
 

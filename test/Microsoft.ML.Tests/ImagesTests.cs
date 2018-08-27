@@ -9,6 +9,7 @@ using Microsoft.ML.Runtime.Model;
 using Microsoft.ML.TestFramework;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -29,12 +30,17 @@ namespace Microsoft.ML.Tests
                 var imageFolder = Path.GetDirectoryName(dataFile);
                 var data = env.CreateLoader("Text{col=ImagePath:TX:0 col=Name:TX:1}", new MultiFileSource(dataFile));
 
-                var loader = new ImageLoaderTransformer(env, imageFolder, ("ImagePath", "ImageReal"));
+                var loader = new ImageLoaderTransform(env, imageFolder, ("ImagePath", "ImageReal"));
                 using (var file = env.CreateTempFile())
                 {
                     using (var fs = file.CreateWriteStream())
                         loader.SaveTo(env, fs);
                     var loader2 = TransformerChain.LoadFrom(env, file.OpenReadStream());
+                    var newCols = ((ImageLoaderTransform)loader2.LastTransformer).Columns;
+                    var oldCols = loader.Columns;
+                    Assert.True(newCols
+                        .Zip(oldCols, (x, y) => x == y)
+                        .All(x => x));
                 }
             }
         }
@@ -47,7 +53,7 @@ namespace Microsoft.ML.Tests
                 var dataFile = GetDataPath("images/images.tsv");
                 var imageFolder = Path.GetDirectoryName(dataFile);
                 var data = env.CreateLoader("Text{col=ImagePath:TX:0 col=Name:TX:1}", new MultiFileSource(dataFile));
-                var images = ImageLoaderTransformer.Create(env, new ImageLoaderTransform.Arguments()
+                var images = ImageLoaderTransform.Create(env, new ImageLoaderTransform.Arguments()
                 {
                     Column = new ImageLoaderTransform.Column[1]
                     {
@@ -100,7 +106,7 @@ namespace Microsoft.ML.Tests
                 var dataFile = GetDataPath("images/images.tsv");
                 var imageFolder = Path.GetDirectoryName(dataFile);
                 var data = env.CreateLoader("Text{col=ImagePath:TX:0 col=Name:TX:1}", new MultiFileSource(dataFile));
-                var images = ImageLoaderTransformer.Create(env, new ImageLoaderTransform.Arguments()
+                var images = ImageLoaderTransform.Create(env, new ImageLoaderTransform.Arguments()
                 {
                     Column = new ImageLoaderTransform.Column[1]
                     {
@@ -153,7 +159,7 @@ namespace Microsoft.ML.Tests
                 var dataFile = GetDataPath("images/images.tsv");
                 var imageFolder = Path.GetDirectoryName(dataFile);
                 var data = env.CreateLoader("Text{col=ImagePath:TX:0 col=Name:TX:1}", new MultiFileSource(dataFile));
-                var images = ImageLoaderTransformer.Create(env, new ImageLoaderTransform.Arguments()
+                var images = ImageLoaderTransform.Create(env, new ImageLoaderTransform.Arguments()
                 {
                     Column = new ImageLoaderTransform.Column[1]
                     {
