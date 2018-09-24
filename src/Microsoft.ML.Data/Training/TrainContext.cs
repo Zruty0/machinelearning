@@ -78,11 +78,8 @@ namespace Microsoft.ML.Runtime.Training
     public sealed class BinaryClassificationContext : TrainContextBase
     {
         /// <summary>
-        /// For trainers for performing binary classification.
+        /// Use extension methods to this property's class to create estimators for binary classification.
         /// </summary>
-        /// <remarks>
-        /// Component authors that have written binary classification. They are great people.
-        /// </remarks>
         public BinaryClassificationTrainers Trainers { get; }
 
         public BinaryClassificationContext(IHostEnvironment env)
@@ -148,7 +145,7 @@ namespace Microsoft.ML.Runtime.Training
     public sealed class MulticlassClassificationContext : TrainContextBase
     {
         /// <summary>
-        /// For trainers for performing multiclass classification.
+        /// Use extension methods to this property's class to create estimators for multiclass classification.
         /// </summary>
         public MulticlassClassificationTrainers Trainers { get; }
 
@@ -199,7 +196,7 @@ namespace Microsoft.ML.Runtime.Training
     public sealed class RegressionContext : TrainContextBase
     {
         /// <summary>
-        /// For trainers for performing regression.
+        /// Use extension methods to this property's class to create estimators for regression.
         /// </summary>
         public RegressionTrainers Trainers { get; }
 

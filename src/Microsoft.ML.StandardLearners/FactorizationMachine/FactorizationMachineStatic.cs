@@ -17,7 +17,7 @@ using System.Linq;
 namespace Microsoft.ML.Trainers
 {
     /// <summary>
-    /// Extension methods and utilities for instantiating FFM trainer estimators inside statically typed pipelines.
+    /// Extension methods and utilities for instantiating <see cref="FieldAwareFactorizationMachineTrainer"/> estimators inside statically typed pipelines.
     /// </summary>
     public static class FactorizationMachineStatic
     {

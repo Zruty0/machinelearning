@@ -35,7 +35,7 @@ namespace Microsoft.ML.Trainers
         /// the linear model that was trained.  Note that this action cannot change the result in any way; it is only a way for the caller to
         /// be informed about what was learnt.</param>
         /// <returns>The predicted output.</returns>
-        public static Scalar<float> Sdca(this RegressionContext.RegressionTrainers ctx,
+        public static Scalar<float> StochasticDualCoordinateAscent(this RegressionContext.RegressionTrainers ctx,
             Scalar<float> label, Vector<float> features, Scalar<float> weights = null,
             float? l2Const = null,
             float? l1Threshold = null,
@@ -90,7 +90,7 @@ namespace Microsoft.ML.Trainers
         /// result in any way; it is only a way for the caller to be informed about what was learnt.</param>
         /// <returns>The set of output columns including in order the predicted binary classification score (which will range
         /// from negative to positive infinity), the calibrated prediction (from 0 to 1), and the predicted label.</returns>
-        public static (Scalar<float> score, Scalar<float> probability, Scalar<bool> predictedLabel) Sdca(
+        public static (Scalar<float> score, Scalar<float> probability, Scalar<bool> predictedLabel) StochasticDualCoordinateAscent(
                 this BinaryClassificationContext.BinaryClassificationTrainers ctx,
                 Scalar<bool> label, Vector<float> features, Scalar<float> weights = null,
                 float? l2Const = null,
@@ -154,8 +154,8 @@ namespace Microsoft.ML.Trainers
         /// result in any way; it is only a way for the caller to be informed about what was learnt.</param>
         /// <returns>The set of output columns including in order the predicted binary classification score (which will range
         /// from negative to positive infinity), and the predicted label.</returns>
-        /// <seealso cref="Sdca(BinaryClassificationContext.BinaryClassificationTrainers, Scalar{bool}, Vector{float}, Scalar{float}, float?, float?, int?, Action{LinearBinaryPredictor, ParameterMixingCalibratedPredictor})"/>
-        public static (Scalar<float> score, Scalar<bool> predictedLabel) Sdca(
+        /// <seealso cref="StochasticDualCoordinateAscent(BinaryClassificationContext.BinaryClassificationTrainers, Scalar{bool}, Vector{float}, Scalar{float}, float?, float?, int?, Action{LinearBinaryPredictor, ParameterMixingCalibratedPredictor})"/>
+        public static (Scalar<float> score, Scalar<bool> predictedLabel) StochasticDualCoordinateAscent(
                 this BinaryClassificationContext.BinaryClassificationTrainers ctx,
                 Scalar<bool> label, Vector<float> features,
                 ISupportSdcaClassificationLoss loss,
@@ -224,7 +224,7 @@ namespace Microsoft.ML.Trainers
         /// result in any way; it is only a way for the caller to be informed about what was learnt.</param>
         /// <returns>The set of output columns including in order the predicted per-class likelihoods (between 0 and 1, and summing up to 1), and the predicted label.</returns>
         public static (Vector<float> score, Key<uint, TVal> predictedLabel)
-            Sdca<TVal>(this MulticlassClassificationContext.MulticlassClassificationTrainers ctx,
+            StochasticDualCoordinateAscent<TVal>(this MulticlassClassificationContext.MulticlassClassificationTrainers ctx,
                 Key<uint, TVal> label,
                 Vector<float> features,
                 ISupportSdcaClassificationLoss loss = null,

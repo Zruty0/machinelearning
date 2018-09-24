@@ -136,14 +136,14 @@ namespace Microsoft.ML.Runtime.Data
         }
 
         /// <summary>
-        /// Evaluates scored multiclass classification data.
+        /// Evaluates scored regression data.
         /// </summary>
         /// <typeparam name="T">The shape type for the input data.</typeparam>
         /// <param name="ctx">The regression context.</param>
         /// <param name="data">The data to evaluate.</param>
         /// <param name="label">The index delegate for the label column.</param>
         /// <param name="score">The index delegate for predicted score column.</param>
-        /// <param name="loss">Potentially custom loss function. If left unspecified defaults to <see cref="SquaredLoss"/>.</param>
+        /// <param name="loss">The loss function. If left unspecified defaults to <see cref="SquaredLoss"/>.</param>
         /// <returns>The evaluation metrics.</returns>
         public static RegressionEvaluator.Result Evaluate<T>(
             this RegressionContext ctx,
