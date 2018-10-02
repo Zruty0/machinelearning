@@ -16,9 +16,19 @@ namespace Microsoft.ML.Runtime.Data
         /// <summary>
         /// Number of columns.
         /// </summary>
-        int ColumnCount {
-            get;
-        }
+        int ColumnCount { get; }
+
+        /// <summary>
+        /// Get the column by index.
+        /// </summary>
+        IColumn this[int col] { get; }
+
+        /// <summary>
+        /// Get the column by name.
+        /// If there are multiple columns by the same name,
+        /// the one with the greatest index is returned.
+        /// </summary>
+        IColumn this[string name] { get; }
 
         /// <summary>
         /// If there is a column with the given name, set col to its index and return true.
@@ -27,6 +37,7 @@ namespace Microsoft.ML.Runtime.Data
         /// </summary>
         bool TryGetColumnIndex(string name, out int col);
 
+        // Legacy schema interface. Duplicates the above and less convenint.
         /// <summary>
         /// Get the name of the given column index. Column names must be non-empty and non-null,
         /// but multiple columns may have the same name.
@@ -59,6 +70,28 @@ namespace Microsoft.ML.Runtime.Data
         /// returned by that call. Otherwise, this should throw an exception.
         /// </summary>
         void GetMetadata<TValue>(string kind, int col, ref TValue value);
+    }
+
+    /// <summary>
+    /// A single column of an <see cref="IDataView"/> (or an <see cref="IRow"/>
+    /// or an <see cref="IStandaloneRow"/>).
+    /// </summary>
+    public interface IColumn
+    {
+        /// <summary>
+        /// The column name.
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
+        /// The column type.
+        /// </summary>
+        ColumnType Type { get; }
+
+        /// <summary>
+        /// The column's metadata.
+        /// </summary>
+        IStandaloneRow Metadata { get; }
     }
 
     /// <summary>
@@ -161,10 +194,22 @@ namespace Microsoft.ML.Runtime.Data
         /// <summary>
         /// Returns a value getter delegate to fetch the given column value from the row.
         /// This throws if the column is not active in this row, or if the type
-        /// <typeparamref name="TValue"/> differs from this row's schema's
-        /// <see cref="ISchema.GetColumnType(int)"/> on <paramref name="col"/>.
+        /// <typeparamref name="TValue"/> differs from this column's type.
         /// </summary>
         ValueGetter<TValue> GetGetter<TValue>(int col);
+    }
+
+    /// <summary>
+    /// A logical row. Every value of every column is retrievable, and immutable.
+    /// </summary>
+    public interface IStandaloneRow : ISchematized
+    {
+        /// <summary>
+        /// Returns a value of a column <paramref name="col"/>.
+        /// This throws if the type <typeparamref name="TValue"/> differs from this row's schema's
+        /// column type.
+        /// </summary>
+        TValue GetValue<TValue>(int col);
     }
 
     /// <summary>
