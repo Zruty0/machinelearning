@@ -409,7 +409,7 @@ namespace Microsoft.ML.Runtime.Learners
             }
         }
 
-        public void AddStatsColumns(List<IColumn> list, LinearBinaryPredictor parent, RoleMappedSchema schema, ref VBuffer<ReadOnlyMemory<char>> names)
+        public void AddStatsColumns(List<IValueColumn> list, LinearBinaryPredictor parent, RoleMappedSchema schema, ref VBuffer<ReadOnlyMemory<char>> names)
         {
             _env.AssertValue(list);
             _env.AssertValueOrNull(parent);

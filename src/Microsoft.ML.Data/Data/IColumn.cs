@@ -24,12 +24,12 @@ namespace Microsoft.ML.Runtime.Data
     /// they were directly instantiated from a row.
     ///
     /// Generally actual implementors of this interface should not implement this directly, but instead implement
-    /// <see cref="IColumn{T}"/>.
+    /// <see cref="IValueColumn{T}"/>.
     /// </summary>
     // REVIEW: It is possible we may want to make this ICounted, but let's not start with
     // that assumption. The use cases I have in mind are that we'll still, on the side, have an
     // IRow lying around.
-    public interface IColumn
+    public interface IValueColumn
     {
         /// <summary>
         /// The name of a column. This string should always be non-empty.
@@ -55,18 +55,18 @@ namespace Microsoft.ML.Runtime.Data
 
         /// <summary>
         /// The value getter, as a <see cref="Delegate"/>. Implementators should just pass through
-        /// <see cref="IColumn{T}.GetGetter"/>.
+        /// <see cref="IValueColumn{T}.GetGetter"/>.
         /// </summary>
         /// <returns>The generic getter delegate</returns>
         Delegate GetGetter();
     }
 
     /// <summary>
-    /// The type specific interface for a <see cref="IColumn"/>.
+    /// The type specific interface for a <see cref="IValueColumn"/>.
     /// </summary>
     /// <typeparam name="T">The type of values in this column. This should agree with the <see cref="ColumnType.RawType"/>
     /// field of <see name="IRowColumn.Type"/>.</typeparam>
-    public interface IColumn<T> : IColumn
+    public interface IValueColumn<T> : IValueColumn
     {
         new ValueGetter<T> GetGetter();
     }
@@ -79,16 +79,16 @@ namespace Microsoft.ML.Runtime.Data
         /// <param name="row">The row to wrap</param>
         /// <param name="col">The column to expose</param>
         /// <returns>A row column instance</returns>
-        public static IColumn GetColumn(IRow row, int col)
+        public static IValueColumn GetColumn(IRow row, int col)
         {
             Contracts.CheckValue(row, nameof(row));
             Contracts.CheckParam(0 <= col && col < row.Schema.ColumnCount, nameof(col));
 
-            Func<IRow, int, IColumn> func = GetColumnCore<int>;
+            Func<IRow, int, IValueColumn> func = GetColumnCore<int>;
             return Utils.MarshalInvoke(func, row.Schema.GetColumnType(col).RawType, row, col);
         }
 
-        private static IColumn GetColumnCore<T>(IRow row, int col)
+        private static IValueColumn GetColumnCore<T>(IRow row, int col)
         {
             Contracts.AssertValue(row);
             Contracts.Assert(0 <= col && col < row.Schema.ColumnCount);
@@ -102,17 +102,17 @@ namespace Microsoft.ML.Runtime.Data
         /// </summary>
         /// <param name="schema">The schema to get the data for</param>
         /// <param name="col">The column to get</param>
-        /// <returns>A column with <see cref="IColumn.IsActive"/> false</returns>
-        public static IColumn GetColumn(ISchema schema, int col)
+        /// <returns>A column with <see cref="IValueColumn.IsActive"/> false</returns>
+        public static IValueColumn GetColumn(ISchema schema, int col)
         {
             Contracts.CheckValue(schema, nameof(schema));
             Contracts.CheckParam(0 <= col && col < schema.ColumnCount, nameof(col));
 
-            Func<ISchema, int, IColumn> func = GetColumnCore<int>;
+            Func<ISchema, int, IValueColumn> func = GetColumnCore<int>;
             return Utils.MarshalInvoke(func, schema.GetColumnType(col).RawType, schema, col);
         }
 
-        private static IColumn GetColumnCore<T>(ISchema schema, int col)
+        private static IValueColumn GetColumnCore<T>(ISchema schema, int col)
         {
             Contracts.AssertValue(schema);
             Contracts.Assert(0 <= col && col < schema.ColumnCount);
@@ -142,7 +142,7 @@ namespace Microsoft.ML.Runtime.Data
         /// <param name="value">The value to store in the column</param>
         /// <param name="meta">Optionally, metadata for the column</param>
         /// <returns>A column with this value</returns>
-        public static IColumn GetColumn<T>(string name, ColumnType type, ref T value, IRow meta = null)
+        public static IValueColumn GetColumn<T>(string name, ColumnType type, ref T value, IRow meta = null)
         {
             Contracts.CheckNonEmpty(name, nameof(name));
             Contracts.CheckValue(type, nameof(type));
@@ -154,7 +154,7 @@ namespace Microsoft.ML.Runtime.Data
             return Utils.MarshalInvoke(GetColumnOneCore<int>, type.RawType, name, type, (object)value, meta);
         }
 
-        private static IColumn GetColumnVecCore<T>(string name, VectorType type, object value, IRow meta)
+        private static IValueColumn GetColumnVecCore<T>(string name, VectorType type, object value, IRow meta)
         {
             // REVIEW: Ugh. Nasty. Any alternative to boxing?
             Contracts.AssertNonEmpty(name);
@@ -167,7 +167,7 @@ namespace Microsoft.ML.Runtime.Data
             return new ConstVecImpl<T>(name, meta, type, typedVal);
         }
 
-        private static IColumn GetColumnOneCore<T>(string name, ColumnType type, object value, IRow meta)
+        private static IValueColumn GetColumnOneCore<T>(string name, ColumnType type, object value, IRow meta)
         {
             Contracts.AssertNonEmpty(name);
             Contracts.AssertValue(type);
@@ -188,7 +188,7 @@ namespace Microsoft.ML.Runtime.Data
         /// <param name="getter">The getter for the column</param>
         /// <param name="meta">Optionally, metadata for the column</param>
         /// <returns>A column with this getter</returns>
-        public static IColumn GetColumn<T>(string name, ColumnType type, ValueGetter<T> getter, IRow meta = null)
+        public static IValueColumn GetColumn<T>(string name, ColumnType type, ValueGetter<T> getter, IRow meta = null)
         {
             Contracts.CheckNonEmpty(name, nameof(name));
             Contracts.CheckValue(type, nameof(type));
@@ -207,7 +207,7 @@ namespace Microsoft.ML.Runtime.Data
         /// that is, a totally static row</param>
         /// <param name="columns">A set of row columns</param>
         /// <returns>A row with items derived from <paramref name="columns"/></returns>
-        public static IRow GetRow(ICounted counted, params IColumn[] columns)
+        public static IRow GetRow(ICounted counted, params IValueColumn[] columns)
         {
             Contracts.CheckValueOrNull(counted);
             Contracts.CheckValue(columns, nameof(columns));
@@ -222,20 +222,20 @@ namespace Microsoft.ML.Runtime.Data
         /// <param name="column"></param>
         /// <returns>A memory materialized version of <paramref name="column"/> which may be,
         /// under appropriate circumstances, the input object itself</returns>
-        public static IColumn CloneColumn(IColumn column)
+        public static IValueColumn CloneColumn(IValueColumn column)
         {
             Contracts.CheckValue(column, nameof(column));
             return Utils.MarshalInvoke(CloneColumnCore<int>, column.Type.RawType, column);
         }
 
-        private static IColumn CloneColumnCore<T>(IColumn column)
+        private static IValueColumn CloneColumnCore<T>(IValueColumn column)
         {
-            Contracts.Assert(column is IColumn<T>);
+            Contracts.Assert(column is IValueColumn<T>);
             IRow meta = column.Metadata;
             if (meta != null)
                 meta = RowCursorUtils.CloneRow(meta);
 
-            var tcolumn = (IColumn<T>)column;
+            var tcolumn = (IValueColumn<T>)column;
             if (!tcolumn.IsActive)
                 return new InactiveImpl<T>(tcolumn.Name, meta, tcolumn.Type);
             T val = default(T);
@@ -246,7 +246,7 @@ namespace Microsoft.ML.Runtime.Data
         /// <summary>
         /// The implementation for a simple wrapping of an <see cref="IRow"/>.
         /// </summary>
-        private sealed class RowWrap<T> : IColumn<T>
+        private sealed class RowWrap<T> : IValueColumn<T>
         {
             private readonly IRow _row;
             private readonly int _col;
@@ -276,7 +276,7 @@ namespace Microsoft.ML.Runtime.Data
                 _col = col;
             }
 
-            Delegate IColumn.GetGetter()
+            Delegate IValueColumn.GetGetter()
                 => GetGetter();
 
             public ValueGetter<T> GetGetter()
@@ -301,7 +301,7 @@ namespace Microsoft.ML.Runtime.Data
         /// Simple wrapper for a schema column, considered inctive with no getter.
         /// </summary>
         /// <typeparam name="T">The type of the getter</typeparam>
-        private sealed class SchemaWrap<T> : IColumn<T>
+        private sealed class SchemaWrap<T> : IValueColumn<T>
         {
             private readonly ISchema _schema;
             private readonly int _col;
@@ -331,7 +331,7 @@ namespace Microsoft.ML.Runtime.Data
                 _col = col;
             }
 
-            Delegate IColumn.GetGetter()
+            Delegate IValueColumn.GetGetter()
                 => GetGetter();
 
             public ValueGetter<T> GetGetter()
@@ -431,10 +431,10 @@ namespace Microsoft.ML.Runtime.Data
         }
 
         /// <summary>
-        /// This is used for a few <see cref="IColumn"/> implementations that need to store their own name,
+        /// This is used for a few <see cref="IValueColumn"/> implementations that need to store their own name,
         /// metadata, and type themselves.
         /// </summary>
-        private abstract class SimpleColumnBase<T> : IColumn<T>
+        private abstract class SimpleColumnBase<T> : IValueColumn<T>
         {
             public string Name { get; }
             public IRow Metadata { get; }
@@ -453,7 +453,7 @@ namespace Microsoft.ML.Runtime.Data
                 Type = type;
             }
 
-            Delegate IColumn.GetGetter()
+            Delegate IValueColumn.GetGetter()
             {
                 return GetGetter();
             }
@@ -544,20 +544,20 @@ namespace Microsoft.ML.Runtime.Data
         }
 
         /// <summary>
-        /// An <see cref="IRow"/> that is an amalgation of multiple <see cref="IColumn"/> implementers.
+        /// An <see cref="IRow"/> that is an amalgation of multiple <see cref="IValueColumn"/> implementers.
         /// </summary>
         private sealed class RowColumnRow : IRow
         {
             private static readonly DefaultCountedImpl _defCount = new DefaultCountedImpl();
             private readonly ICounted _counted;
-            private readonly IColumn[] _columns;
+            private readonly IValueColumn[] _columns;
             private readonly SchemaImpl _schema;
 
             public ISchema Schema => _schema;
             public long Position => _counted.Position;
             public long Batch => _counted.Batch;
 
-            public RowColumnRow(ICounted counted, IColumn[] columns)
+            public RowColumnRow(ICounted counted, IValueColumn[] columns)
             {
                 Contracts.AssertValueOrNull(counted);
                 Contracts.AssertValue(columns);
@@ -569,7 +569,7 @@ namespace Microsoft.ML.Runtime.Data
             public ValueGetter<TValue> GetGetter<TValue>(int col)
             {
                 Contracts.CheckParam(IsColumnActive(col), nameof(col), "requested column not active");
-                var rowCol = _columns[col] as IColumn<TValue>;
+                var rowCol = _columns[col] as IValueColumn<TValue>;
                 if (rowCol == null)
                     throw Contracts.Except("Invalid TValue: '{0}'", typeof(TValue));
                 return rowCol.GetGetter();

@@ -234,7 +234,7 @@ namespace Microsoft.ML.StaticPipe.Runtime
         /// <param name="col">The column</param>
         /// <returns>The .NET type for the static pipelines that should be used to reflect this type, given
         /// both the characteristics of the <see cref="ColumnType"/> as well as one or two crucial pieces of metadata</returns>
-        private static Type GetTypeOrNull(IColumn col)
+        private static Type GetTypeOrNull(IValueColumn col)
         {
             Contracts.AssertValue(col);
             var t = col.Type;

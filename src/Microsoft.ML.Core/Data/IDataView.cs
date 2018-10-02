@@ -37,6 +37,11 @@ namespace Microsoft.ML.Runtime.Data
         /// </summary>
         bool TryGetColumnIndex(string name, out int col);
 
+        /// <summary>
+        /// Returns all non-hidden columns (accessible by name) and their indices.
+        /// </summary>
+        IEnumerable<(int index, IColumn column)> GetColumns();
+
         // Legacy schema interface. Duplicates the above and less convenint.
         /// <summary>
         /// Get the name of the given column index. Column names must be non-empty and non-null,
@@ -205,11 +210,11 @@ namespace Microsoft.ML.Runtime.Data
     public interface IStandaloneRow : ISchematized
     {
         /// <summary>
-        /// Returns a value of a column <paramref name="col"/>.
+        /// Puts a value of a column <paramref name="col"/> into <paramref name="value"/>.
         /// This throws if the type <typeparamref name="TValue"/> differs from this row's schema's
         /// column type.
         /// </summary>
-        TValue GetValue<TValue>(int col);
+        void GetValue<TValue>(int col, ref TValue value);
     }
 
     /// <summary>

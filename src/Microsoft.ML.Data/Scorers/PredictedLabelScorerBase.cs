@@ -67,7 +67,7 @@ namespace Microsoft.ML.Runtime.Data
                         scoreSlotsType.VectorSize == predColType.KeyCount)
                     {
                         Contracts.Assert(scoreSlotsType.VectorSize > 0);
-                        IColumn col = Utils.MarshalInvoke(KeyValueMetadataFromMetadata<int>,
+                        IValueColumn col = Utils.MarshalInvoke(KeyValueMetadataFromMetadata<int>,
                             scoreSlotsType.RawType, mapper.Schema, scoreColIndex, MetadataUtils.Kinds.SlotNames);
                         _predColMetadata = RowColumnUtils.GetRow(null, col);
                     }
@@ -78,7 +78,7 @@ namespace Microsoft.ML.Runtime.Data
                             scoreSlotsType.VectorSize == predColType.KeyCount)
                         {
                             Contracts.Assert(scoreSlotsType.VectorSize > 0);
-                            IColumn col = Utils.MarshalInvoke(KeyValueMetadataFromMetadata<int>,
+                            IValueColumn col = Utils.MarshalInvoke(KeyValueMetadataFromMetadata<int>,
                                 scoreSlotsType.RawType, mapper.Schema, scoreColIndex, MetadataUtils.Kinds.TrainingLabelValues);
                             _predColMetadata = RowColumnUtils.GetRow(null, col);
                         }
@@ -86,7 +86,7 @@ namespace Microsoft.ML.Runtime.Data
                 }
             }
 
-            private static IColumn KeyValueMetadataFromMetadata<T>(ISchema schema, int col, string metadataName)
+            private static IValueColumn KeyValueMetadataFromMetadata<T>(ISchema schema, int col, string metadataName)
             {
                 Contracts.AssertValue(schema);
                 Contracts.Assert(0 <= col && col < schema.ColumnCount);
