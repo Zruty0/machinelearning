@@ -182,8 +182,10 @@ namespace Microsoft.ML.Runtime.Data
         {
             var meta = this[col].Metadata;
             if (meta == null)
-                throw MetadataUtils.ExceptGetMetadata();
-            return meta.Schema[kind].Type;
+                return null;
+            if (meta.Schema.TryGetColumnIndex(kind, out int metaCol))
+                return meta.Schema[metaCol].Type;
+            return null;
         }
 
         public void GetMetadata<TValue>(string kind, int col, ref TValue value)
