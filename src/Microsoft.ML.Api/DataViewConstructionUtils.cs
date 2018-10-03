@@ -83,7 +83,7 @@ namespace Microsoft.ML.Runtime.Api
             public override long Position => _position;
 
             public InputRow(IHostEnvironment env, InternalSchemaDefinition schemaDef)
-                : base(env, MakeSchema(schemaDef), schemaDef, MakePeeks(schemaDef), c => true)
+                : base(env, new Schema(GetSchemaColumns(schemaDef)), schemaDef, MakePeeks(schemaDef), c => true)
             {
                 _position = -1;
             }
@@ -344,7 +344,7 @@ namespace Microsoft.ML.Runtime.Api
                 Host.AssertValue(schemaDefn);
 
                 _schemaDefn = schemaDefn;
-                _schema = MakeSchema(schemaDefn);
+                _schema = new Schema(GetSchemaColumns(schemaDefn));
                 int n = schemaDefn.Columns.Length;
                 _peeks = new Delegate[n];
                 for (var i = 0; i < n; i++)
@@ -751,7 +751,7 @@ namespace Microsoft.ML.Runtime.Api
             }
         }
 
-        private static Schema MakeSchema(InternalSchemaDefinition schemaDefn)
+        internal static Schema.Column[] GetSchemaColumns(InternalSchemaDefinition schemaDefn)
         {
             Contracts.AssertValue(schemaDefn);
             var columns = new Schema.Column[schemaDefn.Columns.Length];
@@ -764,7 +764,7 @@ namespace Microsoft.ML.Runtime.Api
                 columns[i] = new Schema.Column(col.ColumnName, col.ColumnType, meta.GetMetadataRow());
             }
 
-            return new Schema(columns);
+            return columns;
         }
     }
 

@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Microsoft.ML.Runtime.Data
 {
-    public sealed class Schema: ISchema
+    public sealed class Schema : ISchema
     {
         private readonly Column[] _columns;
         private readonly Dictionary<string, int> _nameMap;
@@ -161,6 +161,40 @@ namespace Microsoft.ML.Runtime.Data
         }
 
         public IEnumerable<(int index, Column column)> GetColumns() => _nameMap.Values.Select(idx => (idx, _columns[idx]));
+
+        /// <summary>
+        /// Manufacture an instance of <see cref="Schema"/> out of any <see cref="ISchema"/>.
+        /// </summary>
+        public static Schema Create(ISchema inputSchema)
+        {
+            Contracts.CheckValue(inputSchema, nameof(inputSchema));
+
+            if (inputSchema is Schema s)
+                return s;
+
+            var columns = new Column[inputSchema.ColumnCount];
+            for (int i = 0; i < columns.Length; i++)
+            {
+                var meta = new MetadataRow.Builder();
+                foreach (var kvp in inputSchema.GetMetadataTypes(i))
+                {
+                    var getter = Utils.MarshalInvoke(GetMetadataGetterDelegate<int>, kvp.Value.RawType, inputSchema, i, kvp.Key);
+                    meta.Add(new Column(kvp.Key, kvp.Value, null), getter);
+                }
+                columns[i] = new Column(inputSchema.GetColumnName(i), inputSchema.GetColumnType(i), meta.GetMetadataRow());
+            }
+
+            return new Schema(columns);
+        }
+
+        private static Delegate GetMetadataGetterDelegate<TValue>(ISchema schema, int col, string kind)
+        {
+            // REVIEW: We are facing a choice here: cache 'value' and get rid of 'schema' reference altogether,
+            // or retain the reference but be more memory efficient. This code should not stick around for too long
+            // anyway, so let's not sweat too much, and opt for the latter.
+            ValueGetter<TValue> getter = (ref TValue value) => schema.GetMetadata(kind, col, ref value);
+            return getter;
+        }
 
         #region Legacy schema API to be removed
         public bool TryGetColumnIndex(string name, out int col)
