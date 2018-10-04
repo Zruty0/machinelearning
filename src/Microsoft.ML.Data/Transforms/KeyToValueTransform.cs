@@ -153,7 +153,7 @@ namespace Microsoft.ML.Runtime.Data
         }
 
         protected override IRowMapper MakeRowMapper(ISchema inputSchema)
-            => new Mapper(this, inputSchema);
+            => new Mapper(this, Schema.Create(inputSchema));
 
         private sealed class Mapper : MapperBase, ISaveAsPfa
         {
@@ -161,7 +161,7 @@ namespace Microsoft.ML.Runtime.Data
             private readonly ColumnType[] _types;
             private readonly KeyToValueMap[] _kvMaps;
 
-            public Mapper(KeyToValueTransform parent, ISchema inputSchema)
+            public Mapper(KeyToValueTransform parent, Schema inputSchema)
                 : base(parent.Host.Register(nameof(Mapper)), parent, inputSchema)
             {
                 _parent = parent;
@@ -170,14 +170,14 @@ namespace Microsoft.ML.Runtime.Data
 
             public bool CanSavePfa => true;
 
-            public override RowMapperColumnInfo[] GetOutputColumns()
+            public override Schema.Column[] GetOutputColumns()
             {
-                var result = new RowMapperColumnInfo[_parent.ColumnPairs.Length];
+                var result = new Schema.Column[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
                 {
-                    var meta = RowColumnUtils.GetMetadataAsRow(InputSchema, ColMapNewToOld[i],
-                        x => x == MetadataUtils.Kinds.SlotNames);
-                    result[i] = new RowMapperColumnInfo(_parent.ColumnPairs[i].output, _types[i], meta);
+                    var meta = new Schema.MetadataRow.Builder();
+                    meta.Add(InputSchema[ColMapNewToOld[i]].Metadata, name => name == MetadataUtils.Kinds.SlotNames);
+                    result[i] = new Schema.Column(_parent.ColumnPairs[i].output, _types[i], meta.GetMetadataRow());
                 }
                 return result;
             }

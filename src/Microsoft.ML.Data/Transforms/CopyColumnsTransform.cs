@@ -200,7 +200,7 @@ namespace Microsoft.ML.Runtime.Data
 
         private RowToRowMapperTransform CreateRowToRowMapper(IDataView input)
         {
-            var mapper = new CopyColumnsRowMapper(_host, input.Schema, _columns);
+            var mapper = new CopyColumnsRowMapper(_host, Schema.Create(input.Schema), _columns);
             return new RowToRowMapperTransform(_host, input, mapper);
         }
 
@@ -220,7 +220,7 @@ namespace Microsoft.ML.Runtime.Data
 
     internal sealed class CopyColumnsRowMapper : IRowMapper
     {
-        private readonly ISchema _schema;
+        private readonly Schema _schema;
         private readonly Dictionary<int, int> _colNewToOldMapping;
         private readonly (string Source, string Name)[] _columns;
         private readonly IHost _host;
@@ -238,7 +238,7 @@ namespace Microsoft.ML.Runtime.Data
         }
 
         // Factory method for SignatureLoadRowMapper.
-        private static CopyColumnsRowMapper Create(IHostEnvironment env, ModelLoadContext ctx, ISchema schema)
+        private static CopyColumnsRowMapper Create(IHostEnvironment env, ModelLoadContext ctx, Schema schema)
         {
             Contracts.CheckValue(env, nameof(env));
             env.CheckValue(ctx, nameof(ctx));
@@ -260,7 +260,7 @@ namespace Microsoft.ML.Runtime.Data
             return new CopyColumnsRowMapper(env, schema, columns);
         }
 
-        public CopyColumnsRowMapper(IHostEnvironment env, ISchema schema, (string source, string name)[] columns)
+        public CopyColumnsRowMapper(IHostEnvironment env, Schema schema, (string source, string name)[] columns)
         {
             _host = env.Register(LoaderSignature);
             env.CheckValue(schema, nameof(schema));
@@ -305,16 +305,11 @@ namespace Microsoft.ML.Runtime.Data
             return col => active[col];
         }
 
-        public RowMapperColumnInfo[] GetOutputColumns()
+        public Schema.Column[] GetOutputColumns()
         {
-            var result = new RowMapperColumnInfo[_columns.Length];
+            var result = new Schema.Column[_columns.Length];
             for (int i = 0; i < _columns.Length; i++)
-            {
-                _schema.TryGetColumnIndex(_columns[i].Source, out int colIndex);
-                var colType = _schema.GetColumnType(colIndex);
-                var meta = new RowColumnUtils.MetadataRow(_schema, colIndex, x => true);
-                result[i] = new RowMapperColumnInfo(_columns[i].Name, colType, meta);
-            }
+                result[i] = _schema[_columns[i].Source];
             return result;
         }
 

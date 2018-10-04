@@ -122,10 +122,10 @@ namespace Microsoft.ML.Runtime.Data
         {
             protected readonly IHost Host;
             protected readonly Dictionary<int, int> ColMapNewToOld;
-            protected readonly ISchema InputSchema;
+            protected readonly Schema InputSchema;
             private readonly OneToOneTransformerBase _parent;
 
-            protected MapperBase(IHost host, OneToOneTransformerBase parent, ISchema inputSchema)
+            protected MapperBase(IHost host, OneToOneTransformerBase parent, Schema inputSchema)
             {
                 Contracts.AssertValue(host);
                 Contracts.AssertValue(parent);
@@ -151,7 +151,7 @@ namespace Microsoft.ML.Runtime.Data
                 return col => active[col];
             }
 
-            public abstract RowMapperColumnInfo[] GetOutputColumns();
+            public abstract Schema.Column[] GetOutputColumns();
 
             public void Save(ModelSaveContext ctx) => _parent.Save(ctx);
 
