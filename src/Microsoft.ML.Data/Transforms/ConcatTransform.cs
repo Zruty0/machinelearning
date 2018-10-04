@@ -571,7 +571,10 @@ namespace Microsoft.ML.Runtime.Data
                 public Schema.Column MakeColumnInfo()
                 {
                     if (_isIdentity)
-                        return _inputSchema[SrcIndices[0]];
+                    {
+                        var inputCol = _inputSchema[SrcIndices[0]];
+                        return new Schema.Column(_columnInfo.Output, inputCol.Type, inputCol.Metadata);
+                    }
 
                     var metadata = new Schema.MetadataRow.Builder();
                     if (_isNormalized)
@@ -867,7 +870,12 @@ namespace Microsoft.ML.Runtime.Data
 
             public Delegate[] CreateGetters(IRow input, Func<int, bool> activeOutput, out Action disposer)
             {
-                Contracts.Assert(input.Schema == _inputSchema);
+                // REVIEW: it used to be that the mapper's input schema in the constructor was required to be reference-equal to the schema
+                // of the input row.
+                // It still has to be the same schema, but because we may make a transition from lazy to eager schema, the reference-equality
+                // is no longer always possible. So, we relax the assert as below.
+                if (input.Schema is Schema s)
+                    Contracts.Assert(s == _inputSchema);
                 var result = new Delegate[_columns.Length];
                 for (int i = 0; i < _columns.Length; i++)
                 {

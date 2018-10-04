@@ -238,7 +238,7 @@ namespace Microsoft.ML.Runtime.Data
         }
 
         // Factory method for SignatureLoadRowMapper.
-        private static CopyColumnsRowMapper Create(IHostEnvironment env, ModelLoadContext ctx, Schema schema)
+        private static CopyColumnsRowMapper Create(IHostEnvironment env, ModelLoadContext ctx, ISchema schema)
         {
             Contracts.CheckValue(env, nameof(env));
             env.CheckValue(ctx, nameof(ctx));
@@ -257,7 +257,7 @@ namespace Microsoft.ML.Runtime.Data
                 columns[i].Name = ctx.LoadNonEmptyString();
                 columns[i].Source = ctx.LoadNonEmptyString();
             }
-            return new CopyColumnsRowMapper(env, schema, columns);
+            return new CopyColumnsRowMapper(env, Schema.Create(schema), columns);
         }
 
         public CopyColumnsRowMapper(IHostEnvironment env, Schema schema, (string source, string name)[] columns)
@@ -280,7 +280,12 @@ namespace Microsoft.ML.Runtime.Data
 
         public Delegate[] CreateGetters(IRow input, Func<int, bool> activeOutput, out Action disposer)
         {
-            _host.Assert(input.Schema == _schema);
+            // REVIEW: it used to be that the mapper's input schema in the constructor was required to be reference-equal to the schema
+            // of the input row.
+            // It still has to be the same schema, but because we may make a transition from lazy to eager schema, the reference-equality
+            // is no longer always possible. So, we relax the assert as below.
+            if (input.Schema is Schema s)
+                Contracts.Assert(s == _schema);
             var result = new Delegate[_columns.Length];
             for (int i = 0; i < _columns.Length; i++)
             {
@@ -309,7 +314,10 @@ namespace Microsoft.ML.Runtime.Data
         {
             var result = new Schema.Column[_columns.Length];
             for (int i = 0; i < _columns.Length; i++)
-                result[i] = _schema[_columns[i].Source];
+            {
+                var inputCol = _schema[_columns[i].Source];
+                result[i] = new Schema.Column(_columns[i].Name, inputCol.Type, inputCol.Metadata);
+            }
             return result;
         }
 

@@ -105,8 +105,11 @@ namespace Microsoft.ML.Runtime.Data
 
                 public void Add(MetadataRow metadata, Func<string, bool> selector)
                 {
-                    Contracts.CheckValue(metadata, nameof(metadata));
+                    Contracts.CheckValueOrNull(metadata);
                     Contracts.CheckValue(selector, nameof(selector));
+
+                    if (metadata == null)
+                        return;
 
                     foreach (var pair in metadata._values)
                     {
@@ -208,7 +211,7 @@ namespace Microsoft.ML.Runtime.Data
         {
             var meta = this[col].Metadata;
             if (meta == null)
-                throw MetadataUtils.ExceptGetMetadata();
+                return Enumerable.Empty<KeyValuePair<string, ColumnType>>();
             return meta.Schema.GetColumns().Select(c => new KeyValuePair<string, ColumnType>(c.column.Name, c.column.Type));
         }
 

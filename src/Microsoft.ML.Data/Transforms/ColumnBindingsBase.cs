@@ -668,24 +668,33 @@ namespace Microsoft.ML.Runtime.Data
 
             // Construct the indices.
             var indices = new List<int>();
-            var nameMap = new Dictionary<string, int>();
+            var namesUsed = new HashSet<string>();
             for (int i = 0; i < input.ColumnCount; i++)
             {
-                nameMap[input[i].Name] = i;
+                namesUsed.Add(input[i].Name);
                 indices.Add(i);
             }
 
             for (int i = 0; i < addedColumns.Length; i++)
             {
-                if (nameMap.TryGetValue(addedColumns[i].Name, out int oldIdx) && oldIdx < indices.Count - 1)
+                string name = addedColumns[i].Name;
+                if (namesUsed.Add(name))
                 {
-                    indices.Insert(oldIdx + 1, ~i);
-                    nameMap[addedColumns[i].Name] = oldIdx + 1;
+                    // New name. Append to the end.
+                    indices.Add(~i);
                 }
                 else
                 {
-                    indices.Add(~i);
-                    nameMap[addedColumns[i].Name] = indices.Count - 1;
+                    // Old name. Find last instance and add after it.
+                    for (int j = indices.Count - 1; j >= 0; j--)
+                    {
+                        var colName = indices[j] >= 0 ? input[indices[j]].Name : addedColumns[~indices[j]].Name;
+                        if (colName == name)
+                        {
+                            indices.Insert(j + 1, ~i);
+                            break;
+                        }
+                    }
                 }
             }
             Contracts.Assert(indices.Count == addedColumns.Length + input.ColumnCount);

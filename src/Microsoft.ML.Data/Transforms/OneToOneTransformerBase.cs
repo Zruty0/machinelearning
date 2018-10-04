@@ -157,7 +157,12 @@ namespace Microsoft.ML.Runtime.Data
 
             public Delegate[] CreateGetters(IRow input, Func<int, bool> activeOutput, out Action disposer)
             {
-                Contracts.Assert(input.Schema == InputSchema);
+                // REVIEW: it used to be that the mapper's input schema in the constructor was required to be reference-equal to the schema
+                // of the input row.
+                // It still has to be the same schema, but because we may make a transition from lazy to eager schema, the reference-equality
+                // is no longer always possible. So, we relax the assert as below.
+                if (input.Schema is Schema s)
+                    Contracts.Assert(s == InputSchema);
                 var result = new Delegate[_parent.ColumnPairs.Length];
                 var disposers = new Action[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)

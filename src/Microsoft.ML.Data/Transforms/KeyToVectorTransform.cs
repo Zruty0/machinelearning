@@ -324,7 +324,8 @@ namespace Microsoft.ML.Runtime.Data
                     if (typeNames != null)
                     {
                         var getter = inputMetadata.GetGetter<VBuffer<ReadOnlyMemory<char>>>(metaKeyValuesCol);
-                        builder.AddSlotNames(typeNames.VectorSize, getter);
+                        var slotNamesType = new VectorType(TextType.Instance, _types[iinfo]);
+                        builder.AddSlotNames(slotNamesType.VectorSize, getter);
                     }
                 }
                 else
