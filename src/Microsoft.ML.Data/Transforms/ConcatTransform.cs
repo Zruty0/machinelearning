@@ -550,13 +550,13 @@ namespace Microsoft.ML.Runtime.Data
                 {
                     _columnInfo = columnInfo;
                     SrcIndices = sources;
-                    _srcTypes = sources.Select(c => inputSchema.GetColumnType(c)).ToArray();
+                    _srcTypes = sources.Select(c => inputSchema[c].Type).ToArray();
 
                     OutputType = outputType;
 
                     _inputSchema = inputSchema;
 
-                    _isIdentity = SrcIndices.Length == 1 && _inputSchema.GetColumnType(SrcIndices[0]).IsVector;
+                    _isIdentity = SrcIndices.Length == 1 && _inputSchema[SrcIndices[0]].Type.IsVector;
                     _isNormalized = isNormalized;
 
                     _hasSlotNames = hasSlotNames;
@@ -634,7 +634,7 @@ namespace Microsoft.ML.Runtime.Data
                         int colSrc = SrcIndices[i];
                         var typeSrc = _srcTypes[i];
                         Contracts.Assert(_columnInfo.Inputs[i].alias != "");
-                        var colName = _inputSchema.GetColumnName(colSrc);
+                        var colName = _inputSchema[colSrc].Name;
                         var nameSrc = _columnInfo.Inputs[i].alias ?? colName;
                         if (!typeSrc.IsVector)
                         {
@@ -643,10 +643,15 @@ namespace Microsoft.ML.Runtime.Data
                         }
 
                         Contracts.Assert(typeSrc.IsKnownSizeVector);
-                        var typeNames = _inputSchema.GetMetadataTypeOrNull(MetadataUtils.Kinds.SlotNames, colSrc);
+                        ColumnType typeNames = null;
+
+                        var inputMetadata = _inputSchema[colSrc].Metadata;
+                        if (inputMetadata != null && inputMetadata.Schema.TryGetColumnIndex(MetadataUtils.Kinds.SlotNames, out int idx))
+                            typeNames = inputMetadata.Schema[idx].Type;
+
                         if (typeNames != null && typeNames.VectorSize == typeSrc.VectorSize && typeNames.ItemType.IsText)
                         {
-                            _inputSchema.GetMetadata(MetadataUtils.Kinds.SlotNames, colSrc, ref names);
+                            inputMetadata.GetValue(MetadataUtils.Kinds.SlotNames, ref names);
                             sb.Clear();
                             if (_columnInfo.Inputs[i].alias != colName)
                                 sb.Append(nameSrc).Append(".");
@@ -937,7 +942,7 @@ namespace Microsoft.ML.Runtime.Data
 
                         var srcIndex = boundCol.SrcIndices[i];
                         inputList.Add(new KeyValuePair<string, long>(ctx.GetVariableName(srcName),
-                            _inputSchema.GetColumnType(srcIndex).ValueCount));
+                            _inputSchema[srcIndex].Type.ValueCount));
                     }
 
                     var node = ctx.CreateNode(opType, inputList.Select(t => t.Key),

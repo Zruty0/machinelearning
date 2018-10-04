@@ -373,12 +373,13 @@ namespace Microsoft.ML.Runtime.Data
 
                 // Get the source slot names, defaulting to empty text.
                 var namesSlotSrc = default(VBuffer<ReadOnlyMemory<char>>);
-                InputSchema.TryGetColumnIndex(_infos[iinfo].Source, out int srcCol);
-                Host.Assert(srcCol >= 0);
-                var typeSlotSrc = InputSchema.GetMetadataTypeOrNull(MetadataUtils.Kinds.SlotNames, srcCol);
+
+                var inputMetadata = InputSchema[_infos[iinfo].Source].Metadata;
+                Contracts.AssertValue(inputMetadata);
+                var typeSlotSrc = inputMetadata.Schema.GetColumnOrNull(MetadataUtils.Kinds.SlotNames)?.Type;
                 if (typeSlotSrc != null && typeSlotSrc.VectorSize == typeSrc.VectorSize && typeSlotSrc.ItemType.IsText)
                 {
-                    InputSchema.GetMetadata(MetadataUtils.Kinds.SlotNames, srcCol, ref namesSlotSrc);
+                    inputMetadata.GetValue(MetadataUtils.Kinds.SlotNames, ref namesSlotSrc);
                     Host.Check(namesSlotSrc.Length == typeSrc.VectorSize);
                 }
                 else
@@ -390,7 +391,7 @@ namespace Microsoft.ML.Runtime.Data
 
                 // Get the source key names, in an array (since we will use them multiple times).
                 var namesKeySrc = default(VBuffer<ReadOnlyMemory<char>>);
-                InputSchema.GetMetadata(MetadataUtils.Kinds.KeyValues, srcCol, ref namesKeySrc);
+                inputMetadata.GetValue(MetadataUtils.Kinds.KeyValues, ref namesKeySrc);
                 Host.Check(namesKeySrc.Length == keyCount);
                 var keys = new ReadOnlyMemory<char>[keyCount];
                 namesKeySrc.CopyTo(keys);

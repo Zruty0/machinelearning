@@ -305,12 +305,14 @@ namespace Microsoft.ML.Runtime.Data
 
                 // Get the source slot names, defaulting to empty text.
                 var namesSlotSrc = default(VBuffer<ReadOnlyMemory<char>>);
-                InputSchema.TryGetColumnIndex(_infos[iinfo].Source, out int srcCol);
-                Host.Assert(srcCol >= 0);
-                var typeSlotSrc = InputSchema.GetMetadataTypeOrNull(MetadataUtils.Kinds.SlotNames, srcCol);
+
+                var inputMetadata = InputSchema[_infos[iinfo].Source].Metadata;
+                ColumnType typeSlotSrc = null;
+                if (inputMetadata != null)
+                    typeSlotSrc = inputMetadata.Schema.GetColumnOrNull(MetadataUtils.Kinds.SlotNames)?.Type;
                 if (typeSlotSrc != null && typeSlotSrc.VectorSize == typeSrc.VectorSize && typeSlotSrc.ItemType.IsText)
                 {
-                    InputSchema.GetMetadata(MetadataUtils.Kinds.SlotNames, srcCol, ref namesSlotSrc);
+                    inputMetadata.GetValue(MetadataUtils.Kinds.SlotNames, ref namesSlotSrc);
                     Host.Check(namesSlotSrc.Length == typeSrc.VectorSize);
                 }
                 else

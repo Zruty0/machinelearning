@@ -617,7 +617,7 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
                     var column = _parent._columns[i];
                     Contracts.Assert(column.Planes > 0);
 
-                    var type = InputSchema.GetColumnType(ColMapNewToOld[i]) as ImageType;
+                    var type = InputSchema[ColMapNewToOld[i]].Type as ImageType;
                     Contracts.Assert(type != null);
 
                     int height = type.Height;

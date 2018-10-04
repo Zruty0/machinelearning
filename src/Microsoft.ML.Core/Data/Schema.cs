@@ -38,6 +38,16 @@ namespace Microsoft.ML.Runtime.Data
             }
         }
 
+        public bool TryGetColumnIndex(string name, out int col) => _nameMap.TryGetValue(name, out col);
+
+        public Column GetColumnOrNull(string name)
+        {
+            Contracts.CheckNonEmpty(name, nameof(name));
+            if (_nameMap.TryGetValue(name, out int col))
+                return _columns[col];
+            return null;
+        }
+
         public sealed class Column
         {
             public string Name { get; }
@@ -151,6 +161,13 @@ namespace Microsoft.ML.Runtime.Data
             }
 
             public void GetValue<TValue>(int col, ref TValue value) => GetGetter<TValue>(col)(ref value);
+
+            public void GetValue<TValue>(string kind, ref TValue value)
+            {
+                if (!Schema.TryGetColumnIndex(kind, out int col))
+                    throw MetadataUtils.ExceptGetMetadata();
+                GetValue(col, ref value);
+            }
         }
 
         public Schema(IEnumerable<Column> columns)
@@ -200,14 +217,11 @@ namespace Microsoft.ML.Runtime.Data
         }
 
         #region Legacy schema API to be removed
-        public bool TryGetColumnIndex(string name, out int col)
-            => _nameMap.TryGetValue(name, out col);
+        string ISchema.GetColumnName(int col) => this[col].Name;
 
-        public string GetColumnName(int col) => this[col].Name;
+        ColumnType ISchema.GetColumnType(int col) => this[col].Type;
 
-        public ColumnType GetColumnType(int col) => this[col].Type;
-
-        public IEnumerable<KeyValuePair<string, ColumnType>> GetMetadataTypes(int col)
+        IEnumerable<KeyValuePair<string, ColumnType>> ISchema.GetMetadataTypes(int col)
         {
             var meta = this[col].Metadata;
             if (meta == null)
@@ -215,7 +229,7 @@ namespace Microsoft.ML.Runtime.Data
             return meta.Schema.GetColumns().Select(c => new KeyValuePair<string, ColumnType>(c.column.Name, c.column.Type));
         }
 
-        public ColumnType GetMetadataTypeOrNull(string kind, int col)
+        ColumnType ISchema.GetMetadataTypeOrNull(string kind, int col)
         {
             var meta = this[col].Metadata;
             if (meta == null)
@@ -225,7 +239,7 @@ namespace Microsoft.ML.Runtime.Data
             return null;
         }
 
-        public void GetMetadata<TValue>(string kind, int col, ref TValue value)
+        void ISchema.GetMetadata<TValue>(string kind, int col, ref TValue value)
         {
             var meta = this[col].Metadata;
             if (meta == null)

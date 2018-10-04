@@ -165,7 +165,7 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
             }
 
             public override Schema.Column[] GetOutputColumns()
-                => _parent.ColumnPairs.Select((x, idx) => new Schema.Column(x.output, InputSchema.GetColumnType(ColMapNewToOld[idx]), null)).ToArray();
+                => _parent.ColumnPairs.Select((x, idx) => new Schema.Column(x.output, InputSchema[ColMapNewToOld[idx]].Type, null)).ToArray();
 
             protected override Delegate MakeGetter(IRow input, int iinfo, out Action disposer)
             {

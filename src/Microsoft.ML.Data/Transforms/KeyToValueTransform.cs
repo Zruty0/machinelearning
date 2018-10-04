@@ -254,7 +254,7 @@ namespace Microsoft.ML.Runtime.Data
                 Host.Assert(typeVal.ItemType.RawType == typeof(TValue));
 
                 var keyMetadata = default(VBuffer<TValue>);
-                InputSchema.GetMetadata(MetadataUtils.Kinds.KeyValues, ColMapNewToOld[iinfo], ref keyMetadata);
+                InputSchema[ColMapNewToOld[iinfo]].Metadata.GetValue(MetadataUtils.Kinds.KeyValues, ref keyMetadata);
                 Host.Check(keyMetadata.Length == typeKey.ItemType.KeyCount);
 
                 VBufferUtils.Densify(ref keyMetadata);
@@ -479,7 +479,7 @@ namespace Microsoft.ML.Runtime.Data
                     string cellName = ctx.DeclareCell("KeyToValueMap", PfaUtils.Type.Array(outType), jsonValues);
                     JObject cellRef = PfaUtils.Cell(cellName);
 
-                    var srcType = Parent.InputSchema.GetColumnType(Parent.ColMapNewToOld[InfoIndex]);
+                    var srcType = Parent.InputSchema[Parent.ColMapNewToOld[InfoIndex]].Type;
                     if (srcType.IsVector)
                     {
                         var funcName = ctx.GetFreeFunctionName("mapKeyToValue");
