@@ -119,7 +119,7 @@ namespace Microsoft.ML.Tests.Scenarios.Api.CookbookSamples
                 // between -1 and 1 for all examples), and then train the model.
                 mlContext.Transforms.Normalize("FeatureVector")
                 // Add the SDCA regression trainer.
-                .Append(mlContext.Regression.Trainers.StochasticDualCoordinateAscent(label: "Target", features: "FeatureVector"));
+                .Append(mlContext.Regression.Trainers.StochasticDualCoordinateAscent(labelColumn: "Target", featureColumn: "FeatureVector"));
 
             // Step three. Fit the pipeline to the training data.
             var model = dynamicPipeline.Fit(trainData);
@@ -379,7 +379,7 @@ namespace Microsoft.ML.Tests.Scenarios.Api.CookbookSamples
                 // Convert each categorical feature into one-hot encoding independently.
                 mlContext.Transforms.Categorical.OneHotEncoding("CategoricalFeatures", "CategoricalOneHot")
                 // Convert all categorical features into indices, and build a 'word bag' of these.
-                .Append(mlContext.Transforms.Categorical.OneHotEncoding("CategoricalFeatures", "CategoricalBag", CategoricalTransform.OutputKind.Bag))
+                .Append(mlContext.Transforms.Categorical.OneHotEncoding("CategoricalFeatures", "CategoricalBag", OneHotEncodingTransformer.OutputKind.Bag))
                 // One-hot encode the workclass column, then drop all the categories that have fewer than 10 instances in the train set.
                 .Append(mlContext.Transforms.Categorical.OneHotEncoding("Workclass", "WorkclassOneHot"))
                 .Append(new CountFeatureSelector(mlContext, "WorkclassOneHot", "WorkclassOneHotTrimmed", count: 10));
@@ -539,7 +539,7 @@ namespace Microsoft.ML.Tests.Scenarios.Api.CookbookSamples
             // Construct the learning pipeline. Note that we are now providing a contract name for the custom mapping:
             // otherwise we will not be able to save the model.
             var estimator = mlContext.Transforms.CustomMapping<InputRow, OutputRow>(CustomMappings.IncomeMapping, nameof(CustomMappings.IncomeMapping))
-                .Append(mlContext.BinaryClassification.Trainers.FastTree(label: "Label"));
+                .Append(mlContext.BinaryClassification.Trainers.FastTree(labelColumn: "Label"));
 
             // Train the model.
             var model = estimator.Fit(trainData);
@@ -575,7 +575,7 @@ namespace Microsoft.ML.Tests.Scenarios.Api.CookbookSamples
             Action<InputRow, OutputRow> mapping = (input, output) => output.Label = input.Income > 50000;
             // Construct the learning pipeline.
             var estimator = mlContext.Transforms.CustomMapping(mapping, null)
-                .Append(mlContext.BinaryClassification.Trainers.FastTree(label: "Label"));
+                .Append(mlContext.BinaryClassification.Trainers.FastTree(labelColumn: "Label"));
 
             return estimator.Fit(trainData);
         }
