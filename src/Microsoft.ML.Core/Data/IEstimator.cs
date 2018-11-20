@@ -156,7 +156,7 @@ namespace Microsoft.ML.Core.Data
             Contracts.CheckValue(schema, nameof(schema));
             var cols = new List<Column>();
 
-            for (int iCol = 0; iCol < schema.ColumnCount; iCol++)
+            for (int iCol = 0; iCol < schema.Count; iCol++)
             {
                 if (!schema.IsHidden(iCol))
                 {

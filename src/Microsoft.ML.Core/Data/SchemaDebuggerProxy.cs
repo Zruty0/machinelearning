@@ -19,7 +19,7 @@ namespace Microsoft.ML.Data
 
         public SchemaDebuggerProxy(Schema schema)
         {
-            Columns = Enumerable.Range(0, schema.ColumnCount).Select(x => schema[x]).ToArray();
+            Columns = Enumerable.Range(0, schema.Count).Select(x => schema[x]).ToArray();
         }
     }
 

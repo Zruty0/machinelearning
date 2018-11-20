@@ -232,7 +232,7 @@ namespace Microsoft.ML.Runtime.Data
         {
             uint max = 0;
             colMax = -1;
-            for (int col = 0; col < schema.ColumnCount; col++)
+            for (int col = 0; col < schema.Count; col++)
             {
                 var columnType = schema.GetMetadataTypeOrNull(metadataKind, col);
                 if (columnType == null || !columnType.IsKey || columnType.RawKind != DataKind.U4)
@@ -256,7 +256,7 @@ namespace Microsoft.ML.Runtime.Data
         /// </summary>
         public static IEnumerable<int> GetColumnSet(this Schema schema, string metadataKind, uint value)
         {
-            for (int col = 0; col < schema.ColumnCount; col++)
+            for (int col = 0; col < schema.Count; col++)
             {
                 var columnType = schema.GetMetadataTypeOrNull(metadataKind, col);
                 if (columnType != null && columnType.IsKey && columnType.RawKind == DataKind.U4)
@@ -275,7 +275,7 @@ namespace Microsoft.ML.Runtime.Data
         /// </summary>
         public static IEnumerable<int> GetColumnSet(this Schema schema, string metadataKind, string value)
         {
-            for (int col = 0; col < schema.ColumnCount; col++)
+            for (int col = 0; col < schema.Count; col++)
             {
                 var columnType = schema.GetMetadataTypeOrNull(metadataKind, col);
                 if (columnType != null && columnType.IsText)

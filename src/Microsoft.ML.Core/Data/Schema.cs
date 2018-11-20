@@ -32,7 +32,7 @@ namespace Microsoft.ML.Data
         /// </summary>
         public int ColumnCount => _columns.Length;
 
-        public int Count => throw new NotImplementedException();
+        public int Count => _columns.Length;
 
         /// <summary>
         /// Get the column by name. Throws an exception if such column does not exist.
@@ -53,12 +53,12 @@ namespace Microsoft.ML.Data
         /// <summary>
         /// Get the column by index.
         /// </summary>
-        public Column this[int col]
+        public Column this[int columnIndex]
         {
             get
             {
-                Contracts.CheckParam(0 <= col && col < _columns.Length, nameof(col));
-                return _columns[col];
+                Contracts.CheckParam(0 <= columnIndex && columnIndex < _columns.Length, nameof(columnIndex));
+                return _columns[columnIndex];
             }
         }
 
@@ -128,8 +128,8 @@ namespace Microsoft.ML.Data
 
             public override string ToString()
             {
-                var metadataString = (Metadata == null || Metadata.Schema.ColumnCount == 0) ?
-                    null : $" {{{string.Join(", ", Metadata.Schema.GetColumns().Select(x => x.column.Name))}}}";
+                var metadataString = (Metadata == null || Metadata.Schema.Count == 0) ?
+                    null : $" {{{string.Join(", ", Metadata.Schema.Select(x => x.Name))}}}";
                 return $"{Name}: {Type}{metadataString}";
             }
         }
@@ -266,7 +266,8 @@ namespace Microsoft.ML.Data
         /// <summary>
         /// Manufacture an instance of <see cref="Schema"/> out of any <see cref="ISchema"/>.
         /// </summary>
-        public static Schema Create(ISchema inputSchema)
+        [BestFriend]
+        internal static Schema Create(ISchema inputSchema)
         {
             Contracts.CheckValue(inputSchema, nameof(inputSchema));
 
