@@ -12,6 +12,7 @@ using System.IO;
 using Xunit;
 using Xunit.Abstractions;
 using Microsoft.ML.Transforms.Conversions;
+using Microsoft.ML.Data;
 
 namespace Microsoft.ML.Tests.Transformers
 {

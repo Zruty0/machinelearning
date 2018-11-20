@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
@@ -315,7 +316,7 @@ namespace Microsoft.ML.Runtime.Data
                     }
                 }
 
-                public Counters(int numClusters, bool calculateDbi, ColumnInfo features)
+                public Counters(int numClusters, bool calculateDbi, ColumnInfoRuntime features)
                 {
                     _numClusters = numClusters;
                     CalculateDbi = calculateDbi;
@@ -395,7 +396,7 @@ namespace Microsoft.ML.Runtime.Data
 
             private readonly bool _calculateDbi;
 
-            public Aggregator(IHostEnvironment env, ColumnInfo features, int scoreVectorSize, bool calculateDbi, bool weighted, string stratName)
+            public Aggregator(IHostEnvironment env, ColumnInfoRuntime features, int scoreVectorSize, bool calculateDbi, bool weighted, string stratName)
                 : base(env, stratName)
             {
                 _calculateDbi = calculateDbi;
@@ -759,21 +760,21 @@ namespace Microsoft.ML.Runtime.Data
             return getters;
         }
 
-        public override Schema.Column[] GetOutputColumns()
+        public override ColumnInfo[] GetOutputColumns()
         {
-            var infos = new Schema.Column[3];
-            infos[ClusterIdCol] = new Schema.Column(ClusterId, _types[ClusterIdCol], null);
+            var infos = new ColumnInfo[3];
+            infos[ClusterIdCol] = new ColumnInfo(ClusterId, _types[ClusterIdCol], null);
 
             var slotNamesType = new VectorType(TextType.Instance, _numClusters);
 
-            var sortedClusters = new Schema.Metadata.Builder();
+            var sortedClusters = new MetadataBuilder();
             sortedClusters.AddSlotNames(slotNamesType.VectorSize, CreateSlotNamesGetter(_numClusters, "Cluster"));
 
-            var sortedClusterScores = new Schema.Metadata.Builder();
+            var sortedClusterScores = new MetadataBuilder();
             sortedClusterScores.AddSlotNames(slotNamesType.VectorSize, CreateSlotNamesGetter(_numClusters, "Score"));
 
-            infos[SortedClusterCol] = new Schema.Column(SortedClusters, _types[SortedClusterCol], sortedClusters.GetMetadata());
-            infos[SortedClusterScoreCol] = new Schema.Column(SortedClusterScores, _types[SortedClusterScoreCol], sortedClusterScores.GetMetadata());
+            infos[SortedClusterCol] = new ColumnInfo(SortedClusters, _types[SortedClusterCol], sortedClusters.GetMetadata());
+            infos[SortedClusterScoreCol] = new ColumnInfo(SortedClusterScores, _types[SortedClusterScoreCol], sortedClusterScores.GetMetadata());
             return infos;
         }
 

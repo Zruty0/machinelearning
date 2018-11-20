@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
 using Microsoft.ML.Runtime.Internal.CpuMath;
@@ -570,12 +571,12 @@ namespace Microsoft.ML.Runtime.TimeSeriesProcessing
                     "P-Value Score".AsMemory(), "Martingale Score".AsMemory() });
             }
 
-            public Schema.Column[] GetOutputColumns()
+            public ColumnInfo[] GetOutputColumns()
             {
-                var meta = new Schema.Metadata.Builder();
+                var meta = new MetadataBuilder();
                 meta.AddSlotNames(_parent._outputLength, GetSlotNames);
-                var info = new Schema.Column[1];
-                info[0] = new Schema.Column(_parent.OutputColumnName, new VectorType(NumberType.R8, _parent._outputLength), meta.GetMetadata());
+                var info = new ColumnInfo[1];
+                info[0] = new ColumnInfo(_parent.OutputColumnName, new VectorType(NumberType.R8, _parent._outputLength), meta.GetMetadata());
                 return info;
             }
 

@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.ML.Core.Data;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
@@ -600,11 +601,11 @@ namespace Microsoft.ML.Transforms.Projections
                 }
             }
 
-            public override Schema.Column[] GetOutputColumns()
+            public override Data.ColumnInfo[] GetOutputColumns()
             {
-                var result = new Schema.Column[_numColumns];
+                var result = new Data.ColumnInfo[_numColumns];
                 for (int i = 0; i < _numColumns; i++)
-                    result[i] = new Schema.Column(_parent.ColumnPairs[i].output, _parent._transformInfos[i].OutputType, null);
+                    result[i] = new Data.ColumnInfo(_parent.ColumnPairs[i].output, _parent._transformInfos[i].OutputType, null);
                 return result;
             }
 

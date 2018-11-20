@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.ML.Core.Data;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.Data;
 using Microsoft.ML.Runtime.Model;
@@ -492,20 +493,20 @@ namespace Microsoft.ML.Transforms.Normalizers
                 _parent = parent;
             }
 
-            public override Schema.Column[] GetOutputColumns()
+            public override Data.ColumnInfo[] GetOutputColumns()
             {
-                var result = new Schema.Column[_parent._columns.Length];
+                var result = new Data.ColumnInfo[_parent._columns.Length];
                 for (int i = 0; i < _parent.Columns.Length; i++)
-                    result[i] = new Schema.Column(_parent._columns[i].Output, _parent._columns[i].InputType, MakeMetadata(i));
+                    result[i] = new Data.ColumnInfo(_parent._columns[i].Output, _parent._columns[i].InputType, MakeMetadata(i));
                 return result;
             }
 
             private Schema.Metadata MakeMetadata(int iinfo)
             {
                 var colInfo = _parent._columns[iinfo];
-                var builder = new Schema.Metadata.Builder();
+                var builder = new MetadataBuilder();
 
-                builder.Add(new Schema.Column(MetadataUtils.Kinds.IsNormalized, BoolType.Instance, null), (ValueGetter<bool>)IsNormalizedGetter);
+                builder.Add(MetadataUtils.Kinds.IsNormalized, BoolType.Instance, (ValueGetter<bool>)IsNormalizedGetter);
                 builder.Add(InputSchema[ColMapNewToOld[iinfo]].Metadata, name => name == MetadataUtils.Kinds.SlotNames);
                 return builder.GetMetadata();
             }

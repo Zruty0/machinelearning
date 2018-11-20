@@ -16,6 +16,7 @@ using Microsoft.ML.Runtime.EntryPoints;
 using Microsoft.ML.Runtime.Internal.Utilities;
 using Microsoft.ML.Runtime.Model;
 using Microsoft.ML.Runtime.Numeric;
+using Microsoft.ML.Data;
 
 [assembly: LoadableClass(typeof(MultiOutputRegressionEvaluator), typeof(MultiOutputRegressionEvaluator), typeof(MultiOutputRegressionEvaluator.Arguments), typeof(SignatureEvaluator),
     "Multi Output Regression Evaluator", MultiOutputRegressionEvaluator.LoadName, "MultiOutputRegression", "MRE")]
@@ -450,14 +451,14 @@ namespace Microsoft.ML.Runtime.Data
                     (col == ScoreIndex || col == LabelIndex);
         }
 
-        public override Schema.Column[] GetOutputColumns()
+        public override ColumnInfo[] GetOutputColumns()
         {
-            var infos = new Schema.Column[5];
-            infos[LabelOutput] = new Schema.Column(LabelCol, _labelType, _labelMetadata);
-            infos[ScoreOutput] = new Schema.Column(ScoreCol, _scoreType, _scoreMetadata);
-            infos[L1Output] = new Schema.Column(L1, NumberType.R8, null);
-            infos[L2Output] = new Schema.Column(L2, NumberType.R8, null);
-            infos[DistCol] = new Schema.Column(Dist, NumberType.R8, null);
+            var infos = new ColumnInfo[5];
+            infos[LabelOutput] = new ColumnInfo(LabelCol, _labelType, _labelMetadata);
+            infos[ScoreOutput] = new ColumnInfo(ScoreCol, _scoreType, _scoreMetadata);
+            infos[L1Output] = new ColumnInfo(L1, NumberType.R8, null);
+            infos[L2Output] = new ColumnInfo(L2, NumberType.R8, null);
+            infos[DistCol] = new ColumnInfo(Dist, NumberType.R8, null);
             return infos;
         }
 
@@ -555,7 +556,7 @@ namespace Microsoft.ML.Runtime.Data
                 throw Host.Except("Label column '{0}' has type '{1}' but must be a known-size vector of R4 or R8", LabelCol, t);
             labelType = new VectorType(t.ItemType.AsPrimitive, t.VectorSize);
             var slotNamesType = new VectorType(TextType.Instance, t.VectorSize);
-            var builder = new Schema.Metadata.Builder();
+            var builder = new MetadataBuilder();
             builder.AddSlotNames(t.VectorSize, CreateSlotNamesGetter(schema, LabelIndex, labelType.VectorSize, "True"));
             labelMetadata = builder.GetMetadata();
 
@@ -563,15 +564,15 @@ namespace Microsoft.ML.Runtime.Data
             if (t.VectorSize == 0 || t.ItemType != NumberType.Float)
                 throw Host.Except("Score column '{0}' has type '{1}' but must be a known length vector of type R4", ScoreCol, t);
             scoreType = new VectorType(t.ItemType.AsPrimitive, t.VectorSize);
-            builder = new Schema.Metadata.Builder();
+            builder = new MetadataBuilder();
             builder.AddSlotNames(t.VectorSize, CreateSlotNamesGetter(schema, ScoreIndex, scoreType.VectorSize, "Predicted"));
 
             ValueGetter<ReadOnlyMemory<char>> getter = GetScoreColumnKind;
-            builder.Add(new Schema.Column(MetadataUtils.Kinds.ScoreColumnKind, TextType.Instance, null), getter);
+            builder.Add(MetadataUtils.Kinds.ScoreColumnKind, TextType.Instance, getter);
             getter = GetScoreValueKind;
-            builder.Add(new Schema.Column(MetadataUtils.Kinds.ScoreValueKind, TextType.Instance, null), getter);
+            builder.Add(MetadataUtils.Kinds.ScoreValueKind, TextType.Instance, getter);
             ValueGetter<uint> uintGetter = GetScoreColumnSetId(schema);
-            builder.Add(new Schema.Column(MetadataUtils.Kinds.ScoreColumnSetId, MetadataUtils.ScoreColumnSetIdType, null), uintGetter);
+            builder.Add(MetadataUtils.Kinds.ScoreColumnSetId, MetadataUtils.ScoreColumnSetIdType, uintGetter);
             scoreMetadata = builder.GetMetadata();
         }
 

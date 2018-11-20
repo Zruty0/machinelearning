@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.ML.Core.Data;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
@@ -345,8 +346,8 @@ namespace Microsoft.ML.Transforms.Text
 
             public bool CanSaveOnnx(OnnxContext ctx) => true;
 
-            public override Schema.Column[] GetOutputColumns()
-                => _parent.ColumnPairs.Select(x => new Schema.Column(x.output, _outputType, null)).ToArray();
+            public override Data.ColumnInfo[] GetOutputColumns()
+                => _parent.ColumnPairs.Select(x => new Data.ColumnInfo(x.output, _outputType, null)).ToArray();
 
             public void SaveAsOnnx(OnnxContext ctx)
             {

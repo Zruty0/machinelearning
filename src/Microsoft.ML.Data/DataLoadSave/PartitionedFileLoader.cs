@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
@@ -316,7 +317,9 @@ namespace Microsoft.ML.Runtime.Data
             Contracts.AssertValue(cols);
             Contracts.AssertValue(subLoader);
 
-            var colSchema = new Schema(cols.Select(c => new Schema.Column(c.Name, PrimitiveType.FromKind(c.Type.Value), null)));
+            var builder = new SchemaBuilder();
+            builder.AddColumns(cols.Select(c => new ColumnInfo(c.Name, PrimitiveType.FromKind(c.Type.Value), null)));
+            var colSchema = builder.GetSchema();
 
             var subSchema = subLoader.Schema;
 

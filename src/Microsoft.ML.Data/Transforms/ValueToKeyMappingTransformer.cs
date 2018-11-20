@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
@@ -751,18 +752,18 @@ namespace Microsoft.ML.Transforms.Categorical
                 }
             }
 
-            public override Schema.Column[] GetOutputColumns()
+            public override Data.ColumnInfo[] GetOutputColumns()
             {
-                var result = new Schema.Column[_parent.ColumnPairs.Length];
+                var result = new Data.ColumnInfo[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
                 {
                     InputSchema.TryGetColumnIndex(_parent.ColumnPairs[i].input, out int colIndex);
                     Host.Assert(colIndex >= 0);
-                    var builder = new Schema.Metadata.Builder();
+                    var builder = new MetadataBuilder();
                     _termMap[i].AddMetadata(builder);
 
                     builder.Add(InputSchema[colIndex].Metadata, name => name == MetadataUtils.Kinds.SlotNames);
-                    result[i] = new Schema.Column(_parent.ColumnPairs[i].output, _types[i], builder.GetMetadata());
+                    result[i] = new ML.Data.ColumnInfo(_parent.ColumnPairs[i].output, _types[i], builder.GetMetadata());
                 }
                 return result;
             }

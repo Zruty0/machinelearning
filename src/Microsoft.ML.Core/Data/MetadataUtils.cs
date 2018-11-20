@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.ML.Core.Data;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime.Internal.Utilities;
 
 namespace Microsoft.ML.Runtime.Data
@@ -316,7 +317,7 @@ namespace Microsoft.ML.Runtime.Data
             Contracts.CheckValueOrNull(schema);
             Contracts.CheckParam(vectorSize >= 0, nameof(vectorSize));
 
-            IReadOnlyList<ColumnInfo> list;
+            IReadOnlyList<ColumnInfoRuntime> list;
             if ((list = schema?.GetColumns(role)) == null || list.Count != 1 || !schema.Schema.HasSlotNames(list[0].Index, vectorSize))
             {
                 VBufferUtils.Resize(ref slotNames, vectorSize, 0);
@@ -410,15 +411,7 @@ namespace Microsoft.ML.Runtime.Data
         /// <summary>
         /// Return whether the given column index is hidden in the given schema.
         /// </summary>
-        public static bool IsHidden(this Schema schema, int col)
-        {
-            Contracts.CheckValue(schema, nameof(schema));
-            string name = schema.GetColumnName(col);
-            int top;
-            bool tmp = schema.TryGetColumnIndex(name, out top);
-            Contracts.Assert(tmp); // This would only be false if the implementation of schema were buggy.
-            return !tmp || top != col;
-        }
+        public static bool IsHidden(this Schema schema, int col) => schema[col].IsHidden;
 
         /// <summary>
         /// The categoricalFeatures is a vector of the indices of categorical features slots.

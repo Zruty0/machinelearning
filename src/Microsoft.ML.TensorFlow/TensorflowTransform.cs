@@ -9,6 +9,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using Microsoft.ML.Core.Data;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
@@ -969,11 +970,11 @@ namespace Microsoft.ML.Transforms
                 return col => Enumerable.Range(0, _parent.Outputs.Length).Any(i => activeOutput(i)) && _inputColIndices.Any(i => i == col);
             }
 
-            public Schema.Column[] GetOutputColumns()
+            public ColumnInfo[] GetOutputColumns()
             {
-                var info = new Schema.Column[_parent.Outputs.Length];
+                var info = new ColumnInfo[_parent.Outputs.Length];
                 for (int i = 0; i < _parent.Outputs.Length; i++)
-                    info[i] = new Schema.Column(_parent.Outputs[i], _parent.OutputTypes[i], null);
+                    info[i] = new ColumnInfo(_parent.Outputs[i], _parent.OutputTypes[i], null);
                 return info;
             }
         }

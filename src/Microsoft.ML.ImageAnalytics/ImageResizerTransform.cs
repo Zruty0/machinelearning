@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using Microsoft.ML.Core.Data;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
@@ -302,8 +303,8 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
                 _parent = parent;
             }
 
-            public override Schema.Column[] GetOutputColumns()
-                => _parent._columns.Select(x => new Schema.Column(x.Output, x.Type, null)).ToArray();
+            public override ML.Data.ColumnInfo[] GetOutputColumns()
+                => _parent._columns.Select(x => new ML.Data.ColumnInfo(x.Output, x.Type, null)).ToArray();
 
             protected override Delegate MakeGetter(IRow input, int iinfo, out Action disposer)
             {

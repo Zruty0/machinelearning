@@ -5,6 +5,7 @@
 #pragma warning disable 420 // volatile with Interlocked.CompareExchange
 
 using Microsoft.ML.Core.Data;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
@@ -441,12 +442,12 @@ namespace Microsoft.ML.Transforms.Conversions
                 return true;
             }
 
-            public override Schema.Column[] GetOutputColumns()
+            public override Data.ColumnInfo[] GetOutputColumns()
             {
-                var result = new Schema.Column[_parent._columns.Length];
+                var result = new Data.ColumnInfo[_parent._columns.Length];
                 for (int i = 0; i < _parent._columns.Length; i++)
                 {
-                    var builder = new Schema.Metadata.Builder();
+                    var builder = new MetadataBuilder();
                     var srcType = InputSchema[_srcCols[i]].Type;
                     if (_types[i].IsKnownSizeVector)
                         builder.Add(InputSchema[ColMapNewToOld[i]].Metadata, name => name == MetadataUtils.Kinds.SlotNames);
@@ -460,9 +461,9 @@ namespace Microsoft.ML.Transforms.Conversions
                     if (srcType.IsBool && _types[i].ItemType.IsNumber)
                     {
                         ValueGetter<bool> getter = (ref bool dst) => dst = true;
-                        builder.Add(new Schema.Column(MetadataUtils.Kinds.IsNormalized, BoolType.Instance, null), getter);
+                        builder.Add(MetadataUtils.Kinds.IsNormalized, BoolType.Instance, getter);
                     }
-                    result[i] = new Schema.Column(_parent._columns[i].Output, _types[i], builder.GetMetadata());
+                    result[i] = new Data.ColumnInfo(_parent._columns[i].Output, _types[i], builder.GetMetadata());
                 }
                 return result;
             }

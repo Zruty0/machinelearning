@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.ML.Core.Data;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
@@ -169,8 +170,8 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
                 _parent = parent;
             }
 
-            public override Schema.Column[] GetOutputColumns()
-                => _parent.ColumnPairs.Select((x, idx) => new Schema.Column(x.output, InputSchema[ColMapNewToOld[idx]].Type, null)).ToArray();
+            public override ColumnInfo[] GetOutputColumns()
+                => _parent.ColumnPairs.Select((x, idx) => new ColumnInfo(x.output, InputSchema[ColMapNewToOld[idx]].Type, null)).ToArray();
 
             protected override Delegate MakeGetter(IRow input, int iinfo, out Action disposer)
             {

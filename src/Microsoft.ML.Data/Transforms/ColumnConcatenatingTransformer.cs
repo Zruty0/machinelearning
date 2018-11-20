@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.ML.Core.Data;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
@@ -573,23 +574,23 @@ namespace Microsoft.ML.Runtime.Data
                         _categoricalRangeType = MetadataUtils.GetCategoricalType(catCount / 2);
                 }
 
-                public Schema.Column MakeColumnInfo()
+                public ML.Data.ColumnInfo MakeColumnInfo()
                 {
                     if (_isIdentity)
                     {
                         var inputCol = _inputSchema[SrcIndices[0]];
-                        return new Schema.Column(_columnInfo.Output, inputCol.Type, inputCol.Metadata);
+                        return new ML.Data.ColumnInfo(_columnInfo.Output, inputCol.Type, inputCol.Metadata);
                     }
 
-                    var metadata = new Schema.Metadata.Builder();
+                    var metadata = new MetadataBuilder();
                     if (_isNormalized)
-                        metadata.Add(new Schema.Column(MetadataUtils.Kinds.IsNormalized, BoolType.Instance, null), (ValueGetter<bool>)GetIsNormalized);
+                        metadata.Add(MetadataUtils.Kinds.IsNormalized, BoolType.Instance, (ValueGetter<bool>)GetIsNormalized);
                     if (_hasSlotNames)
                         metadata.AddSlotNames(_slotNamesType.VectorSize, GetSlotNames);
                     if (_hasCategoricals)
-                        metadata.Add(new Schema.Column(MetadataUtils.Kinds.CategoricalSlotRanges, _categoricalRangeType, null), (ValueGetter<VBuffer<int>>)GetCategoricalSlotRanges);
+                        metadata.Add(MetadataUtils.Kinds.CategoricalSlotRanges, _categoricalRangeType, (ValueGetter<VBuffer<int>>)GetCategoricalSlotRanges);
 
-                    return new Schema.Column(_columnInfo.Output, OutputType, metadata.GetMetadata());
+                    return new ML.Data.ColumnInfo(_columnInfo.Output, OutputType, metadata.GetMetadata());
                 }
 
                 private void GetIsNormalized(ref bool value) => value = _isNormalized;
@@ -876,7 +877,7 @@ namespace Microsoft.ML.Runtime.Data
                 return col => active[col];
             }
 
-            public Schema.Column[] GetOutputColumns() => _columns.Select(x => x.MakeColumnInfo()).ToArray();
+            public ML.Data.ColumnInfo[] GetOutputColumns() => _columns.Select(x => x.MakeColumnInfo()).ToArray();
 
             public void Save(ModelSaveContext ctx) => _parent.Save(ctx);
 

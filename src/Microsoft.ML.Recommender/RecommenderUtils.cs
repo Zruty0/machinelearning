@@ -12,14 +12,14 @@ namespace Microsoft.ML.Runtime.Recommender
     {
         /// <summary>
         /// Check if the considered data, <see cref="RoleMappedData"/>, contains column roles specified by <see cref="MatrixColumnIndexKind"/> and <see cref="MatrixRowIndexKind"/>.
-        /// If the column roles, <see cref="MatrixColumnIndexKind"/> and <see cref="MatrixRowIndexKind"/>, uniquely exist in data, their <see cref="ColumnInfo"/> would be assigned
+        /// If the column roles, <see cref="MatrixColumnIndexKind"/> and <see cref="MatrixRowIndexKind"/>, uniquely exist in data, their <see cref="ColumnInfoRuntime"/> would be assigned
         /// to the two out parameters below.
         /// </summary>
         /// <param name="data">The considered data being checked</param>
         /// <param name="matrixColumnIndexColumn">The column as role row index in the input data</param>
         /// <param name="matrixRowIndexColumn">The column as role column index in the input data</param>
         /// <param name="isDecode">Whether a non-user error should be thrown as a decode</param>
-        public static void CheckAndGetMatrixIndexColumns(RoleMappedData data, out ColumnInfo matrixColumnIndexColumn, out ColumnInfo matrixRowIndexColumn, bool isDecode)
+        public static void CheckAndGetMatrixIndexColumns(RoleMappedData data, out ColumnInfoRuntime matrixColumnIndexColumn, out ColumnInfoRuntime matrixRowIndexColumn, bool isDecode)
         {
             Contracts.AssertValue(data);
             CheckRowColumnType(data, MatrixColumnIndexKind, out matrixColumnIndexColumn, isDecode);
@@ -46,7 +46,7 @@ namespace Microsoft.ML.Runtime.Recommender
         /// <param name="info">The extracted column info</param>
         /// <param name="isDecode">Whether a non-user error should be thrown as a decode</param>
         /// <returns>The type cast to a key-type</returns>
-        private static KeyType CheckRowColumnType(RoleMappedData data, RoleMappedSchema.ColumnRole role, out ColumnInfo info, bool isDecode)
+        private static KeyType CheckRowColumnType(RoleMappedData data, RoleMappedSchema.ColumnRole role, out ColumnInfoRuntime info, bool isDecode)
         {
             Contracts.AssertValue(data);
             Contracts.AssertValue(role.Value);

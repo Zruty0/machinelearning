@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime.Data;
 using Microsoft.ML.Runtime.Internal.CpuMath;
 using Microsoft.ML.Runtime.Internal.Utilities;
@@ -64,7 +65,7 @@ namespace Microsoft.ML.Runtime.FactorizationMachine
 
         public ISchemaBindableMapper Bindable => _pred;
 
-        private readonly ColumnInfo[] _columns;
+        private readonly ColumnInfoRuntime[] _columns;
         private readonly List<int> _inputColumnIndexes;
         private readonly IHostEnvironment _env;
 

@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
@@ -659,7 +660,7 @@ namespace Microsoft.ML.Runtime.Data
         private readonly ReadOnlyMemory<char>[] _classNames;
         private readonly ColumnType[] _types;
 
-        public MultiClassPerInstanceEvaluator(IHostEnvironment env, Schema schema, ColumnInfo scoreInfo, string labelCol)
+        public MultiClassPerInstanceEvaluator(IHostEnvironment env, Schema schema, ColumnInfoRuntime scoreInfo, string labelCol)
             : base(env, schema, Contracts.CheckRef(scoreInfo, nameof(scoreInfo)).Name, labelCol)
         {
             CheckInputColumnTypes(schema);
@@ -857,25 +858,25 @@ namespace Microsoft.ML.Runtime.Data
             return getters;
         }
 
-        public override Schema.Column[] GetOutputColumns()
+        public override ColumnInfo[] GetOutputColumns()
         {
-            var infos = new Schema.Column[4];
+            var infos = new ColumnInfo[4];
 
-            var assignedColKeyValues = new Schema.Metadata.Builder();
+            var assignedColKeyValues = new MetadataBuilder();
             assignedColKeyValues.AddKeyValues(_numClasses, TextType.Instance, CreateKeyValueGetter());
-            infos[AssignedCol] = new Schema.Column(Assigned, _types[AssignedCol], assignedColKeyValues.GetMetadata());
+            infos[AssignedCol] = new ColumnInfo(Assigned, _types[AssignedCol], assignedColKeyValues.GetMetadata());
 
-            infos[LogLossCol] = new Schema.Column(LogLoss, _types[LogLossCol], null);
+            infos[LogLossCol] = new ColumnInfo(LogLoss, _types[LogLossCol], null);
 
-            var sortedScores = new Schema.Metadata.Builder();
+            var sortedScores = new MetadataBuilder();
             sortedScores.AddSlotNames(_numClasses, CreateSlotNamesGetter(_numClasses, "Score"));
 
-            var sortedClasses = new Schema.Metadata.Builder();
+            var sortedClasses = new MetadataBuilder();
             sortedClasses.AddSlotNames(_numClasses, CreateSlotNamesGetter(_numClasses, "Class"));
             sortedClasses.AddKeyValues(_numClasses, TextType.Instance, CreateKeyValueGetter());
 
-            infos[SortedScoresCol] = new Schema.Column(SortedScores, _types[SortedScoresCol], sortedScores.GetMetadata());
-            infos[SortedClassesCol] = new Schema.Column(SortedClasses, _types[SortedClassesCol], sortedClasses.GetMetadata());
+            infos[SortedScoresCol] = new ColumnInfo(SortedScores, _types[SortedScoresCol], sortedScores.GetMetadata());
+            infos[SortedClassesCol] = new ColumnInfo(SortedClasses, _types[SortedClassesCol], sortedClasses.GetMetadata());
             return infos;
         }
 

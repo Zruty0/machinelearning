@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data.IO;
 using Microsoft.ML.Runtime.Internal.Utilities;
@@ -34,7 +35,7 @@ namespace Microsoft.ML.Runtime.Data
         public readonly int RowCount;
         // -1 for input columns that were not transposed, a non-negative index into _cols for those that were.
         private readonly int[] _inputToTransposed;
-        private readonly ColumnInfo[] _cols;
+        private readonly ColumnInfoRuntime[] _cols;
         private readonly int[] _splitLim;
         private readonly SchemaImpl _tschema;
         private bool _disposed;
@@ -102,13 +103,13 @@ namespace Microsoft.ML.Runtime.Data
                 columnSet = columnSet.Where(c => ttschema.GetSlotType(c) == null);
             }
             columns = columnSet.ToArray();
-            _cols = new ColumnInfo[columns.Length];
+            _cols = new ColumnInfoRuntime[columns.Length];
             var schema = _view.Schema;
             _nameToICol = new Dictionary<string, int>();
             _inputToTransposed = Utils.CreateArray(schema.ColumnCount, -1);
             for (int c = 0; c < columns.Length; ++c)
             {
-                _nameToICol[(_cols[c] = ColumnInfo.CreateFromIndex(schema, columns[c])).Name] = c;
+                _nameToICol[(_cols[c] = ColumnInfoRuntime.CreateFromIndex(schema, columns[c])).Name] = c;
                 _inputToTransposed[columns[c]] = c;
             }
 
@@ -303,13 +304,13 @@ namespace Microsoft.ML.Runtime.Data
                 _slotTypes = new VectorType[_parent._cols.Length];
                 for (int c = 0; c < _slotTypes.Length; ++c)
                 {
-                    ColumnInfo srcInfo = _parent._cols[c];
+                    ColumnInfoRuntime srcInfo = _parent._cols[c];
                     var ctype = srcInfo.Type.ItemType;
                     _ectx.Assert(ctype.IsPrimitive);
                     _slotTypes[c] = new VectorType(ctype.AsPrimitive, _parent.RowCount);
                 }
 
-                AsSchema = Data.Schema.Create(this);
+                AsSchema = Schema.Create(this);
             }
 
             public bool TryGetColumnIndex(string name, out int col)
@@ -934,7 +935,7 @@ namespace Microsoft.ML.Runtime.Data
                     Contracts.AssertValue(nameToCol);
                     _slicer = slicer;
                     _nameToCol = nameToCol;
-                    AsSchema = Data.Schema.Create(this);
+                    AsSchema = Schema.Create(this);
                 }
 
                 public override bool TryGetColumnIndex(string name, out int col)
@@ -1140,7 +1141,7 @@ namespace Microsoft.ML.Runtime.Data
                         : base(view, col)
                     {
                         Contracts.Assert(_view.Schema.GetColumnType(col).RawType == typeof(T));
-                        AsSchema = Data.Schema.Create(this);
+                        AsSchema = Schema.Create(this);
                     }
 
                     public override ColumnType GetColumnType(int col)
@@ -1226,7 +1227,7 @@ namespace Microsoft.ML.Runtime.Data
                         for (int c = 1; c < _lims.Length; ++c)
                             _types[c] = new VectorType(type.ItemType, _lims[c] - _lims[c - 1]);
 
-                        AsSchema = Data.Schema.Create(this);
+                        AsSchema = Schema.Create(this);
                     }
 
                     public override ColumnType GetColumnType(int col)
@@ -1567,7 +1568,7 @@ namespace Microsoft.ML.Runtime.Data
                 {
                     Contracts.AssertValue(parent);
                     _parent = parent;
-                    AsSchema = Data.Schema.Create(this);
+                    AsSchema = Schema.Create(this);
                 }
 
                 public ColumnType GetColumnType(int col)

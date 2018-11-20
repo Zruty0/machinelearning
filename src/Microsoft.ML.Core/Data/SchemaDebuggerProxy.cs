@@ -7,7 +7,7 @@ using Microsoft.ML.Runtime.Internal.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Microsoft.ML.Core.Data
+namespace Microsoft.ML.Data
 {
     /// <summary>
     /// The debugger proxy for <see cref="Schema"/>.

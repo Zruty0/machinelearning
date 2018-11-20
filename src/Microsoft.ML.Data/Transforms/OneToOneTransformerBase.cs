@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.ML.Core.Data;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime.Model;
 
 namespace Microsoft.ML.Runtime.Data
@@ -147,7 +148,7 @@ namespace Microsoft.ML.Runtime.Data
                 return col => active[col];
             }
 
-            public abstract Schema.Column[] GetOutputColumns();
+            public abstract ColumnInfo[] GetOutputColumns();
 
             public void Save(ModelSaveContext ctx) => _parent.Save(ctx);
 
