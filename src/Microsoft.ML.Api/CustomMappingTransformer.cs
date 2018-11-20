@@ -169,11 +169,11 @@ namespace Microsoft.ML.Transforms
                 return col => false;
             }
 
-            public ColumnInfo[] GetOutputColumns()
+            public ColumnHeader[] GetOutputColumns()
             {
                 var dstRow = new DataViewConstructionUtils.InputRow<TDst>(_host, _parent.AddedSchema);
                 // All the output columns of dstRow are our outputs.
-                return Enumerable.Range(0, dstRow.Schema.ColumnCount).Select(x => new ColumnInfo(dstRow.Schema[x])).ToArray();
+                return Enumerable.Range(0, dstRow.Schema.ColumnCount).Select(x => new ColumnHeader(dstRow.Schema[x])).ToArray();
             }
 
             public void Save(ModelSaveContext ctx)

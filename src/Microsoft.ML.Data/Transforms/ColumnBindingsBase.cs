@@ -669,7 +669,7 @@ namespace Microsoft.ML.Runtime.Data
         /// </summary>
         /// <param name="input">The input schema that we're adding columns to.</param>
         /// <param name="addedColumns">The columns being added.</param>
-        public ColumnBindings(Schema input, ColumnInfo[] addedColumns)
+        public ColumnBindings(Schema input, ColumnHeader[] addedColumns)
         {
             Contracts.CheckValue(input, nameof(input));
             Contracts.CheckValue(addedColumns, nameof(addedColumns));
@@ -710,7 +710,7 @@ namespace Microsoft.ML.Runtime.Data
             Contracts.Assert(indices.Count == addedColumns.Length + input.ColumnCount);
 
             // Create the output schema.
-            var schemaColumns = indices.Select(idx => idx >= 0 ? new ColumnInfo(input[idx]) : addedColumns[~idx]);
+            var schemaColumns = indices.Select(idx => idx >= 0 ? new ColumnHeader(input[idx]) : addedColumns[~idx]);
             Schema = SchemaBuilder.MakeSchema(schemaColumns);
 
             // Memorize column maps.

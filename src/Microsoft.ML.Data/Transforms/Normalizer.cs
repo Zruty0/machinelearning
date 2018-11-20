@@ -493,11 +493,11 @@ namespace Microsoft.ML.Transforms.Normalizers
                 _parent = parent;
             }
 
-            public override Data.ColumnInfo[] GetOutputColumns()
+            public override ColumnHeader[] GetOutputColumns()
             {
-                var result = new Data.ColumnInfo[_parent._columns.Length];
+                var result = new ColumnHeader[_parent._columns.Length];
                 for (int i = 0; i < _parent.Columns.Length; i++)
-                    result[i] = new Data.ColumnInfo(_parent._columns[i].Output, _parent._columns[i].InputType, MakeMetadata(i));
+                    result[i] = new ColumnHeader(_parent._columns[i].Output, _parent._columns[i].InputType, MakeMetadata(i));
                 return result;
             }
 

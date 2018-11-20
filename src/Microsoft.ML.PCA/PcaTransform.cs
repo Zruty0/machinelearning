@@ -601,11 +601,11 @@ namespace Microsoft.ML.Transforms.Projections
                 }
             }
 
-            public override Data.ColumnInfo[] GetOutputColumns()
+            public override ColumnHeader[] GetOutputColumns()
             {
-                var result = new Data.ColumnInfo[_numColumns];
+                var result = new ColumnHeader[_numColumns];
                 for (int i = 0; i < _numColumns; i++)
-                    result[i] = new Data.ColumnInfo(_parent.ColumnPairs[i].output, _parent._transformInfos[i].OutputType, null);
+                    result[i] = new ColumnHeader(_parent.ColumnPairs[i].output, _parent._transformInfos[i].OutputType, null);
                 return result;
             }
 

@@ -43,7 +43,7 @@ namespace Microsoft.ML.Runtime.Data
         /// <summary>
         /// Returns information about the output columns, including their name, type and any metadata information.
         /// </summary>
-        ColumnInfo[] GetOutputColumns();
+        ColumnHeader[] GetOutputColumns();
     }
 
     public delegate void SignatureLoadRowMapper(ModelLoadContext ctx, ISchema schema);

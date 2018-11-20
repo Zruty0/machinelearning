@@ -281,16 +281,16 @@ namespace Microsoft.ML.Transforms.Conversions
                 return infos;
             }
 
-            public override Data.ColumnInfo[] GetOutputColumns()
+            public override ColumnHeader[] GetOutputColumns()
             {
-                var result = new Data.ColumnInfo[_parent.ColumnPairs.Length];
+                var result = new ColumnHeader[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
                 {
                     InputSchema.TryGetColumnIndex(_parent.ColumnPairs[i].input, out int colIndex);
                     Host.Assert(colIndex >= 0);
                     var builder = new MetadataBuilder();
                     AddMetadata(i, builder);
-                    result[i] = new Data.ColumnInfo(_parent.ColumnPairs[i].output, _types[i], builder.GetMetadata());
+                    result[i] = new ColumnHeader(_parent.ColumnPairs[i].output, _types[i], builder.GetMetadata());
                 }
                 return result;
             }

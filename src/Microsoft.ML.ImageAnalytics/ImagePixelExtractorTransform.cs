@@ -426,8 +426,8 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
                 _types = ConstructTypes();
             }
 
-            public override ML.Data.ColumnInfo[] GetOutputColumns()
-                => _parent._columns.Select((x, idx) => new ML.Data.ColumnInfo(x.Output, _types[idx], null)).ToArray();
+            public override ColumnHeader[] GetOutputColumns()
+                => _parent._columns.Select((x, idx) => new ColumnHeader(x.Output, _types[idx], null)).ToArray();
 
             protected override Delegate MakeGetter(IRow input, int iinfo, out Action disposer)
             {

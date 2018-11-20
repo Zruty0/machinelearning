@@ -63,7 +63,7 @@ namespace Microsoft.ML.Transforms.Text
             };
 
             // Create a valid instance of data.
-            var schema = SchemaBuilder.MakeSchema(columns.Select(x => new ColumnInfo(x.input, new VectorType(TextType.Instance), null)));
+            var schema = SchemaBuilder.MakeSchema(columns.Select(x => new ColumnHeader(x.input, new VectorType(TextType.Instance), null)));
             var emptyData = new EmptyDataView(env, schema);
 
             return new TransformWrapper(env, new StopWordsRemovingTransformer(env, args, emptyData));

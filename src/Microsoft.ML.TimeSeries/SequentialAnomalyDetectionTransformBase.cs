@@ -571,12 +571,12 @@ namespace Microsoft.ML.Runtime.TimeSeriesProcessing
                     "P-Value Score".AsMemory(), "Martingale Score".AsMemory() });
             }
 
-            public ColumnInfo[] GetOutputColumns()
+            public ColumnHeader[] GetOutputColumns()
             {
                 var meta = new MetadataBuilder();
                 meta.AddSlotNames(_parent._outputLength, GetSlotNames);
-                var info = new ColumnInfo[1];
-                info[0] = new ColumnInfo(_parent.OutputColumnName, new VectorType(NumberType.R8, _parent._outputLength), meta.GetMetadata());
+                var info = new ColumnHeader[1];
+                info[0] = new ColumnHeader(_parent.OutputColumnName, new VectorType(NumberType.R8, _parent._outputLength), meta.GetMetadata());
                 return info;
             }
 

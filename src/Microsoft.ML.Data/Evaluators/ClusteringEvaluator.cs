@@ -760,10 +760,10 @@ namespace Microsoft.ML.Runtime.Data
             return getters;
         }
 
-        public override ColumnInfo[] GetOutputColumns()
+        public override ColumnHeader[] GetOutputColumns()
         {
-            var infos = new ColumnInfo[3];
-            infos[ClusterIdCol] = new ColumnInfo(ClusterId, _types[ClusterIdCol], null);
+            var infos = new ColumnHeader[3];
+            infos[ClusterIdCol] = new ColumnHeader(ClusterId, _types[ClusterIdCol], null);
 
             var slotNamesType = new VectorType(TextType.Instance, _numClusters);
 
@@ -773,8 +773,8 @@ namespace Microsoft.ML.Runtime.Data
             var sortedClusterScores = new MetadataBuilder();
             sortedClusterScores.AddSlotNames(slotNamesType.VectorSize, CreateSlotNamesGetter(_numClusters, "Score"));
 
-            infos[SortedClusterCol] = new ColumnInfo(SortedClusters, _types[SortedClusterCol], sortedClusters.GetMetadata());
-            infos[SortedClusterScoreCol] = new ColumnInfo(SortedClusterScores, _types[SortedClusterScoreCol], sortedClusterScores.GetMetadata());
+            infos[SortedClusterCol] = new ColumnHeader(SortedClusters, _types[SortedClusterCol], sortedClusters.GetMetadata());
+            infos[SortedClusterScoreCol] = new ColumnHeader(SortedClusterScores, _types[SortedClusterScoreCol], sortedClusterScores.GetMetadata());
             return infos;
         }
 

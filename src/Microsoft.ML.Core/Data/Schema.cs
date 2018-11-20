@@ -93,7 +93,7 @@ namespace Microsoft.ML.Data
             public string Name { get; }
 
             /// <summary>
-            /// Returns the column's index in the schema.
+            /// The column's index in the schema.
             /// </summary>
             public int Index { get; }
 

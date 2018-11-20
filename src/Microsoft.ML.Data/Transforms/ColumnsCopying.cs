@@ -189,13 +189,13 @@ namespace Microsoft.ML.Transforms
                 return Utils.MarshalInvoke(MakeGetter<int>, type.RawType, input, colIndex);
             }
 
-            public override ColumnInfo[] GetOutputColumns()
+            public override ColumnHeader[] GetOutputColumns()
             {
-                var result = new ColumnInfo[_columns.Length];
+                var result = new ColumnHeader[_columns.Length];
                 for (int i = 0; i < _columns.Length; i++)
                 {
                     var srcCol = _schema[_columns[i].Source];
-                    result[i] = new ColumnInfo(_columns[i].Name, srcCol.Type, srcCol.Metadata);
+                    result[i] = new ColumnHeader(_columns[i].Name, srcCol.Type, srcCol.Metadata);
                 }
                 return result;
             }

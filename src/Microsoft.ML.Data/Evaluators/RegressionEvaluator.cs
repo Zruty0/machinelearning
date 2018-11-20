@@ -309,11 +309,11 @@ namespace Microsoft.ML.Runtime.Data
                 col => (activeOutput(L1Col) || activeOutput(L2Col)) && (col == ScoreIndex || col == LabelIndex);
         }
 
-        public override ColumnInfo[] GetOutputColumns()
+        public override ColumnHeader[] GetOutputColumns()
         {
-            var infos = new ColumnInfo[2];
-            infos[L1Col] = new ColumnInfo(L1, NumberType.R8, null);
-            infos[L2Col] = new ColumnInfo(L2, NumberType.R8, null);
+            var infos = new ColumnHeader[2];
+            infos[L1Col] = new ColumnHeader(L1, NumberType.R8, null);
+            infos[L2Col] = new ColumnHeader(L2, NumberType.R8, null);
             return infos;
         }
 

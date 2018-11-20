@@ -1214,16 +1214,16 @@ namespace Microsoft.ML.Runtime.Data
             return Single.IsNaN(val) ? false : val > _threshold;
         }
 
-        public override ColumnInfo[] GetOutputColumns()
+        public override ColumnHeader[] GetOutputColumns()
         {
             if (_probIndex >= 0)
             {
-                var infos = new ColumnInfo[2];
-                infos[LogLossCol] = new ColumnInfo(LogLoss, _types[LogLossCol], null);
-                infos[AssignedCol] = new ColumnInfo(Assigned, _types[AssignedCol], null);
+                var infos = new ColumnHeader[2];
+                infos[LogLossCol] = new ColumnHeader(LogLoss, _types[LogLossCol], null);
+                infos[AssignedCol] = new ColumnHeader(Assigned, _types[AssignedCol], null);
                 return infos;
             }
-            return new[] { new ColumnInfo(Assigned, _types[AssignedCol], null), };
+            return new[] { new ColumnHeader(Assigned, _types[AssignedCol], null), };
         }
 
         private void CheckInputColumnTypes(ISchema schema)

@@ -148,7 +148,7 @@ namespace Microsoft.ML.Runtime.Data
                 return col => active[col];
             }
 
-            public abstract ColumnInfo[] GetOutputColumns();
+            public abstract ColumnHeader[] GetOutputColumns();
 
             public void Save(ModelSaveContext ctx) => _parent.Save(ctx);
 

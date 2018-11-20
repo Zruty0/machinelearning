@@ -889,9 +889,9 @@ namespace Microsoft.ML.Transforms.Conversions
                     _types[i] = _parent.GetOutputType(inputSchema, _parent._columns[i]);
             }
 
-            public override Data.ColumnInfo[] GetOutputColumns()
+            public override ColumnHeader[] GetOutputColumns()
             {
-                var result = new Data.ColumnInfo[_parent.ColumnPairs.Length];
+                var result = new ColumnHeader[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
                 {
                     InputSchema.TryGetColumnIndex(_parent.ColumnPairs[i].input, out int colIndex);
@@ -901,7 +901,7 @@ namespace Microsoft.ML.Transforms.Conversions
 
                     if (_parent._kvTypes != null && _parent._kvTypes[i] != null)
                         AddMetaKeyValues(i, meta);
-                    result[i] = new Data.ColumnInfo(_parent.ColumnPairs[i].output, _types[i], meta.GetMetadata());
+                    result[i] = new ColumnHeader(_parent.ColumnPairs[i].output, _types[i], meta.GetMetadata());
                 }
                 return result;
             }

@@ -318,7 +318,7 @@ namespace Microsoft.ML.Runtime.Data
             Contracts.AssertValue(subLoader);
 
             var builder = new SchemaBuilder();
-            builder.AddColumns(cols.Select(c => new ColumnInfo(c.Name, PrimitiveType.FromKind(c.Type.Value), null)));
+            builder.AddColumns(cols.Select(c => new ColumnHeader(c.Name, PrimitiveType.FromKind(c.Type.Value), null)));
             var colSchema = builder.GetSchema();
 
             var subSchema = subLoader.Schema;

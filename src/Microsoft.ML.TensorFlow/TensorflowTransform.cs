@@ -970,11 +970,11 @@ namespace Microsoft.ML.Transforms
                 return col => Enumerable.Range(0, _parent.Outputs.Length).Any(i => activeOutput(i)) && _inputColIndices.Any(i => i == col);
             }
 
-            public ColumnInfo[] GetOutputColumns()
+            public ColumnHeader[] GetOutputColumns()
             {
-                var info = new ColumnInfo[_parent.Outputs.Length];
+                var info = new ColumnHeader[_parent.Outputs.Length];
                 for (int i = 0; i < _parent.Outputs.Length; i++)
-                    info[i] = new ColumnInfo(_parent.Outputs[i], _parent.OutputTypes[i], null);
+                    info[i] = new ColumnHeader(_parent.Outputs[i], _parent.OutputTypes[i], null);
                 return info;
             }
         }

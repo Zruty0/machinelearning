@@ -792,17 +792,17 @@ namespace Microsoft.ML.Runtime.Api
             }
         }
 
-        internal static ColumnInfo[] GetSchemaColumns(InternalSchemaDefinition schemaDefn)
+        internal static ColumnHeader[] GetSchemaColumns(InternalSchemaDefinition schemaDefn)
         {
             Contracts.AssertValue(schemaDefn);
-            var columns = new ColumnInfo[schemaDefn.Columns.Length];
+            var columns = new ColumnHeader[schemaDefn.Columns.Length];
             for (int i = 0; i < columns.Length; i++)
             {
                 var col = schemaDefn.Columns[i];
                 var meta = new MetadataBuilder();
                 foreach (var kvp in col.Metadata)
                     meta.Add(kvp.Value.Kind, kvp.Value.MetadataType, kvp.Value.GetGetterDelegate());
-                columns[i] = new ColumnInfo(col.ColumnName, col.ColumnType, meta.GetMetadata());
+                columns[i] = new ColumnHeader(col.ColumnName, col.ColumnType, meta.GetMetadata());
             }
 
             return columns;

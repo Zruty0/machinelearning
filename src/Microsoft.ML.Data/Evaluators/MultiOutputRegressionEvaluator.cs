@@ -451,14 +451,14 @@ namespace Microsoft.ML.Runtime.Data
                     (col == ScoreIndex || col == LabelIndex);
         }
 
-        public override ColumnInfo[] GetOutputColumns()
+        public override ColumnHeader[] GetOutputColumns()
         {
-            var infos = new ColumnInfo[5];
-            infos[LabelOutput] = new ColumnInfo(LabelCol, _labelType, _labelMetadata);
-            infos[ScoreOutput] = new ColumnInfo(ScoreCol, _scoreType, _scoreMetadata);
-            infos[L1Output] = new ColumnInfo(L1, NumberType.R8, null);
-            infos[L2Output] = new ColumnInfo(L2, NumberType.R8, null);
-            infos[DistCol] = new ColumnInfo(Dist, NumberType.R8, null);
+            var infos = new ColumnHeader[5];
+            infos[LabelOutput] = new ColumnHeader(LabelCol, _labelType, _labelMetadata);
+            infos[ScoreOutput] = new ColumnHeader(ScoreCol, _scoreType, _scoreMetadata);
+            infos[L1Output] = new ColumnHeader(L1, NumberType.R8, null);
+            infos[L2Output] = new ColumnHeader(L2, NumberType.R8, null);
+            infos[DistCol] = new ColumnHeader(Dist, NumberType.R8, null);
             return infos;
         }
 

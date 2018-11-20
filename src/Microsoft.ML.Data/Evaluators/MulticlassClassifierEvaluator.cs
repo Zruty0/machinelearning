@@ -858,15 +858,15 @@ namespace Microsoft.ML.Runtime.Data
             return getters;
         }
 
-        public override ColumnInfo[] GetOutputColumns()
+        public override ColumnHeader[] GetOutputColumns()
         {
-            var infos = new ColumnInfo[4];
+            var infos = new ColumnHeader[4];
 
             var assignedColKeyValues = new MetadataBuilder();
             assignedColKeyValues.AddKeyValues(_numClasses, TextType.Instance, CreateKeyValueGetter());
-            infos[AssignedCol] = new ColumnInfo(Assigned, _types[AssignedCol], assignedColKeyValues.GetMetadata());
+            infos[AssignedCol] = new ColumnHeader(Assigned, _types[AssignedCol], assignedColKeyValues.GetMetadata());
 
-            infos[LogLossCol] = new ColumnInfo(LogLoss, _types[LogLossCol], null);
+            infos[LogLossCol] = new ColumnHeader(LogLoss, _types[LogLossCol], null);
 
             var sortedScores = new MetadataBuilder();
             sortedScores.AddSlotNames(_numClasses, CreateSlotNamesGetter(_numClasses, "Score"));
@@ -875,8 +875,8 @@ namespace Microsoft.ML.Runtime.Data
             sortedClasses.AddSlotNames(_numClasses, CreateSlotNamesGetter(_numClasses, "Class"));
             sortedClasses.AddKeyValues(_numClasses, TextType.Instance, CreateKeyValueGetter());
 
-            infos[SortedScoresCol] = new ColumnInfo(SortedScores, _types[SortedScoresCol], sortedScores.GetMetadata());
-            infos[SortedClassesCol] = new ColumnInfo(SortedClasses, _types[SortedClassesCol], sortedClasses.GetMetadata());
+            infos[SortedScoresCol] = new ColumnHeader(SortedScores, _types[SortedScoresCol], sortedScores.GetMetadata());
+            infos[SortedClassesCol] = new ColumnHeader(SortedClasses, _types[SortedClassesCol], sortedClasses.GetMetadata());
             return infos;
         }
 

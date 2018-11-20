@@ -344,9 +344,9 @@ namespace Microsoft.ML.Runtime.Data
                 col => (activeOutput(L1Col) || activeOutput(L2Col)) && (col == ScoreIndex || col == LabelIndex);
         }
 
-        public override ColumnInfo[] GetOutputColumns()
+        public override ColumnHeader[] GetOutputColumns()
         {
-            var infos = new ColumnInfo[2];
+            var infos = new ColumnHeader[2];
 
             var slotNamesType = new VectorType(TextType.Instance, _scoreSize);
             var l1Metadata = new MetadataBuilder();
@@ -355,8 +355,8 @@ namespace Microsoft.ML.Runtime.Data
             var l2Metadata = new MetadataBuilder();
             l2Metadata.AddSlotNames(_scoreSize, CreateSlotNamesGetter(L2));
 
-            infos[L1Col] = new ColumnInfo(L1, _outputType, l1Metadata.GetMetadata());
-            infos[L2Col] = new ColumnInfo(L2, _outputType, l2Metadata.GetMetadata());
+            infos[L1Col] = new ColumnHeader(L1, _outputType, l1Metadata.GetMetadata());
+            infos[L2Col] = new ColumnHeader(L2, _outputType, l2Metadata.GetMetadata());
             return infos;
         }
 

@@ -346,8 +346,8 @@ namespace Microsoft.ML.Transforms.Text
 
             public bool CanSaveOnnx(OnnxContext ctx) => true;
 
-            public override Data.ColumnInfo[] GetOutputColumns()
-                => _parent.ColumnPairs.Select(x => new Data.ColumnInfo(x.output, _outputType, null)).ToArray();
+            public override ColumnHeader[] GetOutputColumns()
+                => _parent.ColumnPairs.Select(x => new ColumnHeader(x.output, _outputType, null)).ToArray();
 
             public void SaveAsOnnx(OnnxContext ctx)
             {

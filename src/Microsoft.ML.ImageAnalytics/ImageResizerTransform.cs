@@ -303,8 +303,8 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
                 _parent = parent;
             }
 
-            public override ML.Data.ColumnInfo[] GetOutputColumns()
-                => _parent._columns.Select(x => new ML.Data.ColumnInfo(x.Output, x.Type, null)).ToArray();
+            public override ColumnHeader[] GetOutputColumns()
+                => _parent._columns.Select(x => new ML.Data.ColumnHeader(x.Output, x.Type, null)).ToArray();
 
             protected override Delegate MakeGetter(IRow input, int iinfo, out Action disposer)
             {

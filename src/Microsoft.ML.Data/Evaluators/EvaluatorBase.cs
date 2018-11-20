@@ -505,7 +505,7 @@ namespace Microsoft.ML.Runtime.Data
 
         public abstract Func<int, bool> GetDependencies(Func<int, bool> activeOutput);
 
-        public abstract ColumnInfo[] GetOutputColumns();
+        public abstract ColumnHeader[] GetOutputColumns();
 
         public abstract Delegate[] CreateGetters(IRow input, Func<int, bool> activeCols, out Action disposer);
     }

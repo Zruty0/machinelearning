@@ -206,7 +206,7 @@ namespace Microsoft.ML.Runtime.Data
             ectx.CheckValue(columns, nameof(columns));
 
             var builder = new SchemaBuilder();
-            builder.AddColumns(columns.Select(kvp => new ML.Data.ColumnInfo(kvp.Key, kvp.Value, null)));
+            builder.AddColumns(columns.Select(kvp => new ML.Data.ColumnHeader(kvp.Key, kvp.Value, null)));
             return builder.GetSchema();
         }
     }
