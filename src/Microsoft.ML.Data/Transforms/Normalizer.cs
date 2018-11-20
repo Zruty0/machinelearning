@@ -493,7 +493,7 @@ namespace Microsoft.ML.Transforms.Normalizers
                 _parent = parent;
             }
 
-            public override ColumnHeader[] GetOutputColumnsCore()
+            protected override ColumnHeader[] GetOutputColumnsCore()
             {
                 var result = new ColumnHeader[_parent.Columns.Length];
                 for (int i = 0; i < _parent.Columns.Length; i++)

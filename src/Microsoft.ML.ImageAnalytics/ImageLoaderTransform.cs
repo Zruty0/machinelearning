@@ -207,7 +207,7 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
                 return del;
             }
 
-            public override ColumnHeader[] GetOutputColumnsCore()
+            protected override ColumnHeader[] GetOutputColumnsCore()
                 => _parent.ColumnPairs.Select(x => new ColumnHeader(x.output, _imageType, null)).ToArray();
         }
     }

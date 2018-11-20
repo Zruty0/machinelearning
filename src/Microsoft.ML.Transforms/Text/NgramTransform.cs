@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.ML.Core.Data;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.CommandLine;
 using Microsoft.ML.Runtime.Data;
@@ -563,20 +564,20 @@ namespace Microsoft.ML.Transforms.Text
                 }
             }
 
-            protected override Schema.Column[] GetOutputColumnsCore()
+            protected override ColumnHeader[] GetOutputColumnsCore()
             {
-                var result = new Schema.Column[_parent.ColumnPairs.Length];
+                var result = new ColumnHeader[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
                 {
-                    var builder = new Schema.Metadata.Builder();
+                    var builder = new MetadataBuilder();
                     AddMetadata(i, builder);
 
-                    result[i] = new Schema.Column(_parent.ColumnPairs[i].output, _types[i], builder.GetMetadata());
+                    result[i] = new ColumnHeader(_parent.ColumnPairs[i].output, _types[i], builder.GetMetadata());
                 }
                 return result;
             }
 
-            private void AddMetadata(int iinfo, Schema.Metadata.Builder builder)
+            private void AddMetadata(int iinfo, MetadataBuilder builder)
             {
                 if (InputSchema.HasKeyValues(_srcCols[iinfo], _srcTypes[iinfo].ItemType.KeyCount))
                 {

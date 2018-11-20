@@ -675,7 +675,7 @@ namespace Microsoft.ML.Transforms.Projections
             /// to ensure unit variance, and finally we rotate the scaled result back to the original space using U (note that UU^T is identity matrix so U is
             /// the inverse rotation of U^T).
             /// </summary>
-            public override ColumnHeader[] GetOutputColumnsCore()
+            protected override ColumnHeader[] GetOutputColumnsCore()
             {
                 var result = new ColumnHeader[_parent.ColumnPairs.Length];
                 for (int iinfo = 0; iinfo < _parent.ColumnPairs.Length; iinfo++)

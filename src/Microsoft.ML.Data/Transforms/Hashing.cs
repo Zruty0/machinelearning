@@ -889,7 +889,7 @@ namespace Microsoft.ML.Transforms.Conversions
                     _types[i] = _parent.GetOutputType(inputSchema, _parent._columns[i]);
             }
 
-            public override ColumnHeader[] GetOutputColumnsCore()
+            protected override ColumnHeader[] GetOutputColumnsCore()
             {
                 var result = new ColumnHeader[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)

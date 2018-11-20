@@ -189,7 +189,7 @@ namespace Microsoft.ML.Transforms
                 return Utils.MarshalInvoke(MakeGetter<int>, type.RawType, input, colIndex);
             }
 
-            public override ColumnHeader[] GetOutputColumns()
+            protected override ColumnHeader[] GetOutputColumnsCore()
             {
                 var result = new ColumnHeader[_columns.Length];
                 for (int i = 0; i < _columns.Length; i++)

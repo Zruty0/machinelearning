@@ -442,7 +442,7 @@ namespace Microsoft.ML.Transforms.Conversions
                 return true;
             }
 
-            public override ColumnHeader[] GetOutputColumnsCore()
+            protected override ColumnHeader[] GetOutputColumnsCore()
             {
                 var result = new ColumnHeader[_parent._columns.Length];
                 for (int i = 0; i < _parent._columns.Length; i++)

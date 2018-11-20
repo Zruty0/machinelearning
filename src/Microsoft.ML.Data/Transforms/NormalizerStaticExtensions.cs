@@ -4,6 +4,8 @@
 
 using Microsoft.ML.Core.Data;
 using Microsoft.ML.Data;
+using Microsoft.ML.Runtime;
+using Microsoft.ML.Runtime.Data;
 using Microsoft.ML.Runtime.Internal.Utilities;
 using Microsoft.ML.StaticPipe.Runtime;
 using Microsoft.ML.Transforms.Normalizers;
