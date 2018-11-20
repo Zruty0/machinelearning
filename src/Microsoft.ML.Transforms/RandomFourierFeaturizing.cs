@@ -532,11 +532,11 @@ namespace Microsoft.ML.Transforms.Projections
                 }
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var result = new ColumnHeader[_parent.ColumnPairs.Length];
+                var result = new Schema.DetachedColumn[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
-                    result[i] = new ColumnHeader(_parent.ColumnPairs[i].output, _types[i], null);
+                    result[i] = new Schema.DetachedColumn(_parent.ColumnPairs[i].output, _types[i], null);
                 return result;
             }
 

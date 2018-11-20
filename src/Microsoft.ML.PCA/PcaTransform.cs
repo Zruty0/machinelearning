@@ -601,11 +601,11 @@ namespace Microsoft.ML.Transforms.Projections
                 }
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var result = new ColumnHeader[_numColumns];
+                var result = new Schema.DetachedColumn[_numColumns];
                 for (int i = 0; i < _numColumns; i++)
-                    result[i] = new ColumnHeader(_parent.ColumnPairs[i].output, _parent._transformInfos[i].OutputType, null);
+                    result[i] = new Schema.DetachedColumn(_parent.ColumnPairs[i].output, _parent._transformInfos[i].OutputType, null);
                 return result;
             }
 

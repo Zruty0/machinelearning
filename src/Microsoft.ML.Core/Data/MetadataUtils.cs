@@ -312,7 +312,7 @@ namespace Microsoft.ML.Runtime.Data
             Contracts.CheckValueOrNull(schema);
             Contracts.CheckParam(vectorSize >= 0, nameof(vectorSize));
 
-            IReadOnlyList<ColumnInfoRuntime> list;
+            IReadOnlyList<ColumnInfo> list;
             if ((list = schema?.GetColumns(role)) == null || list.Count != 1 || !schema.Schema.HasSlotNames(list[0].Index, vectorSize))
             {
                 VBufferUtils.Resize(ref slotNames, vectorSize, 0);

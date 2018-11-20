@@ -675,16 +675,16 @@ namespace Microsoft.ML.Transforms.Projections
             /// to ensure unit variance, and finally we rotate the scaled result back to the original space using U (note that UU^T is identity matrix so U is
             /// the inverse rotation of U^T).
             /// </summary>
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var result = new ColumnHeader[_parent.ColumnPairs.Length];
+                var result = new Schema.DetachedColumn[_parent.ColumnPairs.Length];
                 for (int iinfo = 0; iinfo < _parent.ColumnPairs.Length; iinfo++)
                 {
                     InputSchema.TryGetColumnIndex(_parent.ColumnPairs[iinfo].input, out int colIndex);
                     Host.Assert(colIndex >= 0);
                     var info = _parent._columns[iinfo];
                     ColumnType outType = (info.Kind == WhiteningKind.Pca && info.PcaNum > 0) ? new VectorType(NumberType.Float, info.PcaNum) : _srcTypes[iinfo];
-                    result[iinfo] = new ColumnHeader(_parent.ColumnPairs[iinfo].output, outType, null);
+                    result[iinfo] = new Schema.DetachedColumn(_parent.ColumnPairs[iinfo].output, outType, null);
                 }
                 return result;
             }

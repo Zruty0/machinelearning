@@ -918,11 +918,11 @@ namespace Microsoft.ML.Transforms
                 return col => Enumerable.Range(0, _parent.Outputs.Length).Any(i => activeOutput(i)) && _inputColIndices.Any(i => i == col);
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var info = new ColumnHeader[_parent.Outputs.Length];
+                var info = new Schema.DetachedColumn[_parent.Outputs.Length];
                 for (int i = 0; i < _parent.Outputs.Length; i++)
-                    info[i] = new ColumnHeader(_parent.Outputs[i], _parent.OutputTypes[i], null);
+                    info[i] = new Schema.DetachedColumn(_parent.Outputs[i], _parent.OutputTypes[i], null);
                 return info;
             }
         }

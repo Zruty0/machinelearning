@@ -752,9 +752,9 @@ namespace Microsoft.ML.Transforms.Categorical
                 }
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var result = new ColumnHeader[_parent.ColumnPairs.Length];
+                var result = new Schema.DetachedColumn[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
                 {
                     InputSchema.TryGetColumnIndex(_parent.ColumnPairs[i].input, out int colIndex);
@@ -763,7 +763,7 @@ namespace Microsoft.ML.Transforms.Categorical
                     _termMap[i].AddMetadata(builder);
 
                     builder.Add(InputSchema[colIndex].Metadata, name => name == MetadataUtils.Kinds.SlotNames);
-                    result[i] = new ColumnHeader(_parent.ColumnPairs[i].output, _types[i], builder.GetMetadata());
+                    result[i] = new Schema.DetachedColumn(_parent.ColumnPairs[i].output, _types[i], builder.GetMetadata());
                 }
                 return result;
             }

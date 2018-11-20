@@ -503,7 +503,7 @@ namespace Microsoft.ML.Runtime.Data
 
         public abstract Func<int, bool> GetDependencies(Func<int, bool> activeOutput);
 
-        public abstract ColumnHeader[] GetOutputColumns();
+        public abstract Schema.DetachedColumn[] GetOutputColumns();
 
         public abstract Delegate[] CreateGetters(IRow input, Func<int, bool> activeCols, out Action disposer);
     }

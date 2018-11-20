@@ -205,14 +205,14 @@ namespace Microsoft.ML.Transforms.Text
                     _isSourceVector[i] = inputSchema[_parent.ColumnPairs[i].input].Type.IsVector;
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var result = new ColumnHeader[_parent.ColumnPairs.Length];
+                var result = new Schema.DetachedColumn[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
                 {
                     var builder = new MetadataBuilder();
                     AddMetadata(i, builder);
-                    result[i] = new ColumnHeader(_parent.ColumnPairs[i].output, _type, builder.GetMetadata());
+                    result[i] = new Schema.DetachedColumn(_parent.ColumnPairs[i].output, _type, builder.GetMetadata());
                 }
                 return result;
             }

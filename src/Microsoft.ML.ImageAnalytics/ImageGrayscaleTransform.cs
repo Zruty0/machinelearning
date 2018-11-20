@@ -170,8 +170,8 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
                 _parent = parent;
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
-                => _parent.ColumnPairs.Select((x, idx) => new ColumnHeader(x.output, InputSchema[ColMapNewToOld[idx]].Type, null)).ToArray();
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
+                => _parent.ColumnPairs.Select((x, idx) => new Schema.DetachedColumn(x.output, InputSchema[ColMapNewToOld[idx]].Type, null)).ToArray();
 
             protected override Delegate MakeGetter(IRow input, int iinfo, Func<int, bool> activeOutput, out Action disposer)
             {

@@ -248,7 +248,7 @@ namespace Microsoft.ML.Runtime.Training
             CursOpt opt, int n, IRandom rand, IEnumerable<int> extraCols = null)
             => data.Data.GetRowCursorSet(out consolidator, CreatePredicate(data, opt, extraCols), n, rand);
 
-        private static void AddOpt(HashSet<int> cols, ColumnInfoRuntime info)
+        private static void AddOpt(HashSet<int> cols, ColumnInfo info)
         {
             Contracts.AssertValue(cols);
             if (info != null)

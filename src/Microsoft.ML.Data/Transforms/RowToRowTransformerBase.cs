@@ -54,7 +54,7 @@ namespace Microsoft.ML.Runtime.Data
         {
             protected readonly IHost Host;
             protected readonly Schema InputSchema;
-            private readonly ColumnHeader[] _outputColumns;
+            private readonly Schema.DetachedColumn[] _outputColumns;
 
             protected MapperBase(IHost host, Schema inputSchema)
             {
@@ -65,9 +65,9 @@ namespace Microsoft.ML.Runtime.Data
                 _outputColumns = GetOutputColumnsCore();
             }
 
-            protected abstract ColumnHeader[] GetOutputColumnsCore();
+            protected abstract Schema.DetachedColumn[] GetOutputColumnsCore();
 
-            public ColumnHeader[] GetOutputColumns() => _outputColumns;
+            public Schema.DetachedColumn[] GetOutputColumns() => _outputColumns;
 
             public Delegate[] CreateGetters(IRow input, Func<int, bool> activeOutput, out Action disposer)
             {

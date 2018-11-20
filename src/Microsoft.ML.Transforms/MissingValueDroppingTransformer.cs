@@ -180,14 +180,14 @@ namespace Microsoft.ML.Transforms
 
             private Delegate GetIsNADelegate<T>(ColumnType type) => Runtime.Data.Conversion.Conversions.Instance.GetIsNAPredicate<T>(type.ItemType);
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var result = new ColumnHeader[_parent.ColumnPairs.Length];
+                var result = new Schema.DetachedColumn[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
                 {
                     var builder = new MetadataBuilder();
                     builder.Add(InputSchema[ColMapNewToOld[i]].Metadata, x => x == MetadataUtils.Kinds.KeyValues || x == MetadataUtils.Kinds.IsNormalized);
-                    result[i] = new ColumnHeader(_parent.ColumnPairs[i].output, _types[i], builder.GetMetadata());
+                    result[i] = new Schema.DetachedColumn(_parent.ColumnPairs[i].output, _types[i], builder.GetMetadata());
                 }
                 return result;
             }

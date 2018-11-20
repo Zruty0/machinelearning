@@ -316,7 +316,7 @@ namespace Microsoft.ML.Runtime.Data
             Contracts.AssertValue(ectx);
             Contracts.AssertValue(cols);
             var builder = new SchemaBuilder();
-            builder.AddColumns(cols.Select(c => new ColumnHeader(c.Name, c.ColType, null)));
+            builder.AddColumns(cols.Select(c => new ML.Data.Schema.DetachedColumn(c.Name, c.ColType, null)));
             return builder.GetSchema();
         }
 

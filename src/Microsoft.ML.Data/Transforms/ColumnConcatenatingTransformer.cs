@@ -546,12 +546,12 @@ namespace Microsoft.ML.Runtime.Data
                         _categoricalRangeType = MetadataUtils.GetCategoricalType(catCount / 2);
                 }
 
-                public ColumnHeader MakeColumnInfo()
+                public Schema.DetachedColumn MakeColumnInfo()
                 {
                     if (_isIdentity)
                     {
                         var inputCol = _inputSchema[SrcIndices[0]];
-                        return new ColumnHeader(_columnInfo.Output, inputCol.Type, inputCol.Metadata);
+                        return new Schema.DetachedColumn(_columnInfo.Output, inputCol.Type, inputCol.Metadata);
                     }
 
                     var metadata = new MetadataBuilder();
@@ -562,7 +562,7 @@ namespace Microsoft.ML.Runtime.Data
                     if (_hasCategoricals)
                         metadata.Add(MetadataUtils.Kinds.CategoricalSlotRanges, _categoricalRangeType, (ValueGetter<VBuffer<int>>)GetCategoricalSlotRanges);
 
-                    return new ML.Data.ColumnHeader(_columnInfo.Output, OutputType, metadata.GetMetadata());
+                    return new ML.Data.Schema.DetachedColumn(_columnInfo.Output, OutputType, metadata.GetMetadata());
                 }
 
                 private void GetIsNormalized(ref bool value) => value = _isNormalized;
@@ -843,7 +843,7 @@ namespace Microsoft.ML.Runtime.Data
                 return col => active[col];
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore() => _columns.Select(x => x.MakeColumnInfo()).ToArray();
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore() => _columns.Select(x => x.MakeColumnInfo()).ToArray();
 
             public override void Save(ModelSaveContext ctx) => _parent.Save(ctx);
 

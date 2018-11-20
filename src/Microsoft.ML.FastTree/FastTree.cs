@@ -1319,7 +1319,7 @@ namespace Microsoft.ML.Trainers.FastTree
                 return _dataset;
             }
 
-            private static int AddColumnIfNeeded(ColumnInfoRuntime info, List<int> toTranspose)
+            private static int AddColumnIfNeeded(ColumnInfo info, List<int> toTranspose)
             {
                 if (info == null)
                     return -1;

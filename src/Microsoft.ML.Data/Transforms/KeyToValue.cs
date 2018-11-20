@@ -170,14 +170,14 @@ namespace Microsoft.ML.Transforms.Conversions
 
             public bool CanSavePfa => true;
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var result = new ColumnHeader[_parent.ColumnPairs.Length];
+                var result = new Schema.DetachedColumn[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
                 {
                     var meta = new MetadataBuilder();
                     meta.Add(InputSchema[ColMapNewToOld[i]].Metadata, name => name == MetadataUtils.Kinds.SlotNames);
-                    result[i] = new ColumnHeader(_parent.ColumnPairs[i].output, _types[i], meta.GetMetadata());
+                    result[i] = new Schema.DetachedColumn(_parent.ColumnPairs[i].output, _types[i], meta.GetMetadata());
                 }
                 return result;
             }

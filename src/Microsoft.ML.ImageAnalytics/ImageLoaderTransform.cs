@@ -207,8 +207,8 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
                 return del;
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
-                => _parent.ColumnPairs.Select(x => new ColumnHeader(x.output, _imageType, null)).ToArray();
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
+                => _parent.ColumnPairs.Select(x => new Schema.DetachedColumn(x.output, _imageType, null)).ToArray();
         }
     }
 

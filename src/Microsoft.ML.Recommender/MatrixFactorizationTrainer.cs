@@ -260,10 +260,10 @@ namespace Microsoft.ML.Trainers
             ch.AssertValue(data);
             ch.AssertValueOrNull(validData);
 
-            ColumnInfoRuntime matrixColumnIndexColInfo;
-            ColumnInfoRuntime matrixRowIndexColInfo;
-            ColumnInfoRuntime validMatrixColumnIndexColInfo = null;
-            ColumnInfoRuntime validMatrixRowIndexColInfo = null;
+            ColumnInfo matrixColumnIndexColInfo;
+            ColumnInfo matrixRowIndexColInfo;
+            ColumnInfo validMatrixColumnIndexColInfo = null;
+            ColumnInfo validMatrixRowIndexColInfo = null;
 
             ch.CheckValue(data.Schema.Label, nameof(data), "Input data did not have a unique label");
             RecommenderUtils.CheckAndGetMatrixIndexColumns(data, out matrixColumnIndexColInfo, out matrixRowIndexColInfo, isDecode: false);

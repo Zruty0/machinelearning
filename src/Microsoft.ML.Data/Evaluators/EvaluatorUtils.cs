@@ -104,7 +104,7 @@ namespace Microsoft.ML.Runtime.Data
         /// most recent score set of the given kind. If there is no such score set and defName is specifed it
         /// uses defName. Otherwise, it throws.
         /// </summary>
-        public static ColumnInfoRuntime GetScoreColumnInfo(IExceptionContext ectx, Schema schema, string name, string argName, string kind,
+        public static ColumnInfo GetScoreColumnInfo(IExceptionContext ectx, Schema schema, string name, string argName, string kind,
             string valueKind = MetadataUtils.Const.ScoreValueKind.Score, string defName = null)
         {
             Contracts.CheckValueOrNull(ectx);
@@ -115,11 +115,11 @@ namespace Microsoft.ML.Runtime.Data
             ectx.CheckNonEmpty(valueKind, nameof(valueKind));
 
             int colTmp;
-            ColumnInfoRuntime info;
+            ColumnInfo info;
             if (!string.IsNullOrWhiteSpace(name))
             {
 #pragma warning disable MSML_ContractsNameUsesNameof
-                if (!ColumnInfoRuntime.TryCreateFromName(schema, name, out info))
+                if (!ColumnInfo.TryCreateFromName(schema, name, out info))
                     throw ectx.ExceptUserArg(argName, "Score column is missing");
 #pragma warning restore MSML_ContractsNameUsesNameof
                 return info;
@@ -141,11 +141,11 @@ namespace Microsoft.ML.Runtime.Data
                 if (schema.TryGetMetadata(TextType.Instance, MetadataUtils.Kinds.ScoreValueKind, col, ref tmp) &&
                     ReadOnlyMemoryUtils.EqualsStr(valueKind, tmp))
                 {
-                    return ColumnInfoRuntime.CreateFromIndex(schema, col);
+                    return ColumnInfo.CreateFromIndex(schema, col);
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(defName) && ColumnInfoRuntime.TryCreateFromName(schema, defName, out info))
+            if (!string.IsNullOrWhiteSpace(defName) && ColumnInfo.TryCreateFromName(schema, defName, out info))
                 return info;
 
 #pragma warning disable MSML_ContractsNameUsesNameof
@@ -158,7 +158,7 @@ namespace Microsoft.ML.Runtime.Data
         /// Otherwise, if colScore is part of a score set, this looks in the score set for a column
         /// with the given valueKind. If none is found, it returns null.
         /// </summary>
-        public static ColumnInfoRuntime GetOptAuxScoreColumnInfo(IExceptionContext ectx, Schema schema, string name, string argName,
+        public static ColumnInfo GetOptAuxScoreColumnInfo(IExceptionContext ectx, Schema schema, string name, string argName,
             int colScore, string valueKind, Func<ColumnType, bool> testType)
         {
             Contracts.CheckValueOrNull(ectx);
@@ -170,9 +170,9 @@ namespace Microsoft.ML.Runtime.Data
 
             if (!string.IsNullOrWhiteSpace(name))
             {
-                ColumnInfoRuntime info;
+                ColumnInfo info;
 #pragma warning disable MSML_ContractsNameUsesNameof
-                if (!ColumnInfoRuntime.TryCreateFromName(schema, name, out info))
+                if (!ColumnInfo.TryCreateFromName(schema, name, out info))
                     throw ectx.ExceptUserArg(argName, "{0} column is missing", valueKind);
                 if (!testType(info.Type))
                     throw ectx.ExceptUserArg(argName, "{0} column has incompatible type", valueKind);
@@ -199,7 +199,7 @@ namespace Microsoft.ML.Runtime.Data
                 if (schema.TryGetMetadata(TextType.Instance, MetadataUtils.Kinds.ScoreValueKind, col, ref tmp) &&
                     ReadOnlyMemoryUtils.EqualsStr(valueKind, tmp))
                 {
-                    var res = ColumnInfoRuntime.CreateFromIndex(schema, col);
+                    var res = ColumnInfo.CreateFromIndex(schema, col);
                     if (testType(res.Type))
                         return res;
                 }
@@ -228,7 +228,7 @@ namespace Microsoft.ML.Runtime.Data
         /// If str is non-empty, returns it. Otherwise if info is non-null, returns info.Name.
         /// Otherwise, returns def.
         /// </summary>
-        public static string GetColName(string str, ColumnInfoRuntime info, string def)
+        public static string GetColName(string str, ColumnInfo info, string def)
         {
             Contracts.CheckValueOrNull(str);
             Contracts.CheckValueOrNull(info);

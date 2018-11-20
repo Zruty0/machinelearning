@@ -49,7 +49,7 @@ namespace Microsoft.ML.Data
         /// Add multiple existing columns to the schema being built.
         /// </summary>
         /// <param name="source">Columns to add.</param>
-        public void AddColumns(IEnumerable<ColumnHeader> source)
+        public void AddColumns(IEnumerable<Schema.DetachedColumn> source)
         {
             foreach (var column in source)
                 AddColumn(column.Name, column.Type, column.Metadata);
@@ -72,7 +72,7 @@ namespace Microsoft.ML.Data
         }
 
         [BestFriend]
-        internal static Schema MakeSchema(IEnumerable<ColumnHeader> columns)
+        internal static Schema MakeSchema(IEnumerable<Schema.DetachedColumn> columns)
         {
             var builder = new SchemaBuilder();
             builder.AddColumns(columns);

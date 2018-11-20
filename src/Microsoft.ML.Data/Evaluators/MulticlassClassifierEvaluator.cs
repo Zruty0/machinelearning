@@ -657,7 +657,7 @@ namespace Microsoft.ML.Runtime.Data
         private readonly ReadOnlyMemory<char>[] _classNames;
         private readonly ColumnType[] _types;
 
-        public MultiClassPerInstanceEvaluator(IHostEnvironment env, Schema schema, ColumnInfoRuntime scoreInfo, string labelCol)
+        public MultiClassPerInstanceEvaluator(IHostEnvironment env, Schema schema, ColumnInfo scoreInfo, string labelCol)
             : base(env, schema, Contracts.CheckRef(scoreInfo, nameof(scoreInfo)).Name, labelCol)
         {
             CheckInputColumnTypes(schema);
@@ -851,15 +851,15 @@ namespace Microsoft.ML.Runtime.Data
             return getters;
         }
 
-        public override ColumnHeader[] GetOutputColumns()
+        public override Schema.DetachedColumn[] GetOutputColumns()
         {
-            var infos = new ColumnHeader[4];
+            var infos = new Schema.DetachedColumn[4];
 
             var assignedColKeyValues = new MetadataBuilder();
             assignedColKeyValues.AddKeyValues(_numClasses, TextType.Instance, CreateKeyValueGetter());
-            infos[AssignedCol] = new ColumnHeader(Assigned, _types[AssignedCol], assignedColKeyValues.GetMetadata());
+            infos[AssignedCol] = new Schema.DetachedColumn(Assigned, _types[AssignedCol], assignedColKeyValues.GetMetadata());
 
-            infos[LogLossCol] = new ColumnHeader(LogLoss, _types[LogLossCol], null);
+            infos[LogLossCol] = new Schema.DetachedColumn(LogLoss, _types[LogLossCol], null);
 
             var sortedScores = new MetadataBuilder();
             sortedScores.AddSlotNames(_numClasses, CreateSlotNamesGetter(_numClasses, "Score"));
@@ -868,8 +868,8 @@ namespace Microsoft.ML.Runtime.Data
             sortedClasses.AddSlotNames(_numClasses, CreateSlotNamesGetter(_numClasses, "Class"));
             sortedClasses.AddKeyValues(_numClasses, TextType.Instance, CreateKeyValueGetter());
 
-            infos[SortedScoresCol] = new ColumnHeader(SortedScores, _types[SortedScoresCol], sortedScores.GetMetadata());
-            infos[SortedClassesCol] = new ColumnHeader(SortedClasses, _types[SortedClassesCol], sortedClasses.GetMetadata());
+            infos[SortedScoresCol] = new Schema.DetachedColumn(SortedScores, _types[SortedScoresCol], sortedScores.GetMetadata());
+            infos[SortedClassesCol] = new Schema.DetachedColumn(SortedClasses, _types[SortedClassesCol], sortedClasses.GetMetadata());
             return infos;
         }
 

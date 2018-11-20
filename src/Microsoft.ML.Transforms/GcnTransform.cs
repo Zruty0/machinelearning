@@ -446,16 +446,16 @@ namespace Microsoft.ML.Transforms.Projections
                 }
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var result = new ColumnHeader[_parent.ColumnPairs.Length];
+                var result = new Schema.DetachedColumn[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
                 {
                     var builder = new MetadataBuilder();
                     builder.Add(InputSchema[ColMapNewToOld[i]].Metadata, name => name == MetadataUtils.Kinds.SlotNames);
                     ValueGetter<bool> getter = (ref bool dst) => dst = true;
                     builder.Add(MetadataUtils.Kinds.IsNormalized, BoolType.Instance, getter);
-                    result[i] = new ColumnHeader(_parent.ColumnPairs[i].output, _types[i], builder.GetMetadata());
+                    result[i] = new Schema.DetachedColumn(_parent.ColumnPairs[i].output, _types[i], builder.GetMetadata());
                 }
                 return result;
             }

@@ -191,9 +191,9 @@ namespace Microsoft.ML.Transforms
                 return infos;
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var result = new ColumnHeader[_parent.ColumnPairs.Length];
+                var result = new Schema.DetachedColumn[_parent.ColumnPairs.Length];
                 for (int iinfo = 0; iinfo < _infos.Length; iinfo++)
                 {
                     InputSchema.TryGetColumnIndex(_infos[iinfo].Input, out int colIndex);
@@ -205,7 +205,7 @@ namespace Microsoft.ML.Transforms
                         dst = true;
                     };
                     builder.Add(MetadataUtils.Kinds.IsNormalized, BoolType.Instance, getter);
-                    result[iinfo] = new ColumnHeader(_infos[iinfo].Output, _infos[iinfo].OutputType, builder.GetMetadata());
+                    result[iinfo] = new Schema.DetachedColumn(_infos[iinfo].Output, _infos[iinfo].OutputType, builder.GetMetadata());
                 }
                 return result;
             }

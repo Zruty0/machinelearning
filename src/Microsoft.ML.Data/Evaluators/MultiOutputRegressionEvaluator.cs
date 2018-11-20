@@ -448,14 +448,14 @@ namespace Microsoft.ML.Runtime.Data
                     (col == ScoreIndex || col == LabelIndex);
         }
 
-        public override ColumnHeader[] GetOutputColumns()
+        public override Schema.DetachedColumn[] GetOutputColumns()
         {
-            var infos = new ColumnHeader[5];
-            infos[LabelOutput] = new ColumnHeader(LabelCol, _labelType, _labelMetadata);
-            infos[ScoreOutput] = new ColumnHeader(ScoreCol, _scoreType, _scoreMetadata);
-            infos[L1Output] = new ColumnHeader(L1, NumberType.R8, null);
-            infos[L2Output] = new ColumnHeader(L2, NumberType.R8, null);
-            infos[DistCol] = new ColumnHeader(Dist, NumberType.R8, null);
+            var infos = new Schema.DetachedColumn[5];
+            infos[LabelOutput] = new Schema.DetachedColumn(LabelCol, _labelType, _labelMetadata);
+            infos[ScoreOutput] = new Schema.DetachedColumn(ScoreCol, _scoreType, _scoreMetadata);
+            infos[L1Output] = new Schema.DetachedColumn(L1, NumberType.R8, null);
+            infos[L2Output] = new Schema.DetachedColumn(L2, NumberType.R8, null);
+            infos[DistCol] = new Schema.DetachedColumn(Dist, NumberType.R8, null);
             return infos;
         }
 

@@ -65,7 +65,7 @@ namespace Microsoft.ML.Runtime.FactorizationMachine
 
         public ISchemaBindableMapper Bindable => _pred;
 
-        private readonly ColumnInfoRuntime[] _columns;
+        private readonly ColumnInfo[] _columns;
         private readonly List<int> _inputColumnIndexes;
         private readonly IHostEnvironment _env;
 

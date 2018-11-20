@@ -245,14 +245,14 @@ namespace Microsoft.ML.Transforms.Text
                 }
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var result = new ColumnHeader[_parent.ColumnPairs.Length];
+                var result = new Schema.DetachedColumn[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
                 {
                     InputSchema.TryGetColumnIndex(_parent.ColumnPairs[i].input, out int colIndex);
                     Host.Assert(colIndex >= 0);
-                    result[i] = new ColumnHeader(_parent.ColumnPairs[i].output, _type, null);
+                    result[i] = new Schema.DetachedColumn(_parent.ColumnPairs[i].output, _type, null);
                 }
                 return result;
             }

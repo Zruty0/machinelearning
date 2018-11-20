@@ -210,10 +210,10 @@ namespace Microsoft.ML.Transforms
                 Host.Assert(_outputItemRawType == _outputColType.ItemType.RawType);
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var info = new ColumnHeader[1];
-                info[0] = new ColumnHeader(_outputColName, _outputColType, null);
+                var info = new Schema.DetachedColumn[1];
+                info[0] = new Schema.DetachedColumn(_outputColName, _outputColType, null);
                 return info;
             }
 

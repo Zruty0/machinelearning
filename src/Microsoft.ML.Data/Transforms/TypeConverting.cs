@@ -442,9 +442,9 @@ namespace Microsoft.ML.Transforms.Conversions
                 return true;
             }
 
-            protected override ColumnHeader[] GetOutputColumnsCore()
+            protected override Schema.DetachedColumn[] GetOutputColumnsCore()
             {
-                var result = new ColumnHeader[_parent._columns.Length];
+                var result = new Schema.DetachedColumn[_parent._columns.Length];
                 for (int i = 0; i < _parent._columns.Length; i++)
                 {
                     var builder = new MetadataBuilder();
@@ -463,7 +463,7 @@ namespace Microsoft.ML.Transforms.Conversions
                         ValueGetter<bool> getter = (ref bool dst) => dst = true;
                         builder.Add(MetadataUtils.Kinds.IsNormalized, BoolType.Instance, getter);
                     }
-                    result[i] = new ColumnHeader(_parent._columns[i].Output, _types[i], builder.GetMetadata());
+                    result[i] = new Schema.DetachedColumn(_parent._columns[i].Output, _types[i], builder.GetMetadata());
                 }
                 return result;
             }

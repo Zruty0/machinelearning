@@ -316,7 +316,7 @@ namespace Microsoft.ML.Runtime.Data
                     }
                 }
 
-                public Counters(int numClusters, bool calculateDbi, ColumnInfoRuntime features)
+                public Counters(int numClusters, bool calculateDbi, ColumnInfo features)
                 {
                     _numClusters = numClusters;
                     CalculateDbi = calculateDbi;
@@ -396,7 +396,7 @@ namespace Microsoft.ML.Runtime.Data
 
             private readonly bool _calculateDbi;
 
-            public Aggregator(IHostEnvironment env, ColumnInfoRuntime features, int scoreVectorSize, bool calculateDbi, bool weighted, string stratName)
+            public Aggregator(IHostEnvironment env, ColumnInfo features, int scoreVectorSize, bool calculateDbi, bool weighted, string stratName)
                 : base(env, stratName)
             {
                 _calculateDbi = calculateDbi;
@@ -756,10 +756,10 @@ namespace Microsoft.ML.Runtime.Data
             return getters;
         }
 
-        public override ColumnHeader[] GetOutputColumns()
+        public override Schema.DetachedColumn[] GetOutputColumns()
         {
-            var infos = new ColumnHeader[3];
-            infos[ClusterIdCol] = new ColumnHeader(ClusterId, _types[ClusterIdCol], null);
+            var infos = new Schema.DetachedColumn[3];
+            infos[ClusterIdCol] = new Schema.DetachedColumn(ClusterId, _types[ClusterIdCol], null);
 
             var slotNamesType = new VectorType(TextType.Instance, _numClusters);
 
@@ -769,8 +769,8 @@ namespace Microsoft.ML.Runtime.Data
             var sortedClusterScores = new MetadataBuilder();
             sortedClusterScores.AddSlotNames(slotNamesType.VectorSize, CreateSlotNamesGetter(_numClusters, "Score"));
 
-            infos[SortedClusterCol] = new ColumnHeader(SortedClusters, _types[SortedClusterCol], sortedClusters.GetMetadata());
-            infos[SortedClusterScoreCol] = new ColumnHeader(SortedClusterScores, _types[SortedClusterScoreCol], sortedClusterScores.GetMetadata());
+            infos[SortedClusterCol] = new Schema.DetachedColumn(SortedClusters, _types[SortedClusterCol], sortedClusters.GetMetadata());
+            infos[SortedClusterScoreCol] = new Schema.DetachedColumn(SortedClusterScores, _types[SortedClusterScoreCol], sortedClusterScores.GetMetadata());
             return infos;
         }
 
