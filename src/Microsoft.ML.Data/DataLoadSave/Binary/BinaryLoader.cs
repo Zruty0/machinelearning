@@ -2138,7 +2138,7 @@ namespace Microsoft.ML.Runtime.Data.IO
             }
         }
 
-        public sealed class InfoCommand : ICommand
+        internal sealed class InfoCommand : ICommand
         {
             public const string LoadName = "IdvInfo";
 

@@ -381,7 +381,7 @@ namespace Microsoft.ML.Transforms.Projections
 
             for (int i = 0; i < columns.Length; i++)
             {
-                if(!inputSchema.TryGetColumnIndex(columns[i].Input, out cols[i]))
+                if (!inputSchema.TryGetColumnIndex(columns[i].Input, out cols[i]))
                     throw env.ExceptSchemaMismatch(nameof(inputSchema), "input", columns[i].Input);
                 srcTypes[i] = inputSchema.GetColumnType(cols[i]);
                 var reason = TestColumn(srcTypes[i]);
@@ -642,7 +642,7 @@ namespace Microsoft.ML.Transforms.Projections
         protected override IRowMapper MakeRowMapper(Schema schema)
             => new Mapper(this, schema);
 
-        private sealed class Mapper : MapperBase
+        private sealed class Mapper : OneToOneMapperBase
         {
             private readonly VectorWhiteningTransformer _parent;
             private readonly int[] _cols;
@@ -675,7 +675,7 @@ namespace Microsoft.ML.Transforms.Projections
             /// to ensure unit variance, and finally we rotate the scaled result back to the original space using U (note that UU^T is identity matrix so U is
             /// the inverse rotation of U^T).
             /// </summary>
-            public override ColumnHeader[] GetOutputColumns()
+            public override ColumnHeader[] GetOutputColumnsCore()
             {
                 var result = new ColumnHeader[_parent.ColumnPairs.Length];
                 for (int iinfo = 0; iinfo < _parent.ColumnPairs.Length; iinfo++)
@@ -689,7 +689,7 @@ namespace Microsoft.ML.Transforms.Projections
                 return result;
             }
 
-            protected override Delegate MakeGetter(IRow input, int iinfo, out Action disposer)
+            protected override Delegate MakeGetter(IRow input, int iinfo, Func<int, bool> activeOutput, out Action disposer)
             {
                 Host.AssertValue(input);
                 Host.Assert(0 <= iinfo && iinfo < _parent.ColumnPairs.Length);

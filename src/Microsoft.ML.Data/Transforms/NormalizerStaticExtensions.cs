@@ -5,14 +5,13 @@
 using Microsoft.ML.Core.Data;
 using Microsoft.ML.Data;
 using Microsoft.ML.Runtime.Internal.Utilities;
-using Microsoft.ML.StaticPipe;
 using Microsoft.ML.StaticPipe.Runtime;
 using Microsoft.ML.Transforms.Normalizers;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace Microsoft.ML.Runtime.Data
+namespace Microsoft.ML.StaticPipe
 {
     /// <summary>
     /// Extension methods for static pipelines for normalization of data.
@@ -311,7 +310,7 @@ namespace Microsoft.ML.Runtime.Data
                 return null;
             return col =>
             {
-                var aCol = (NormalizingTransformer.IAffineData<TData>)col;
+                var aCol = (NormalizingTransformer.AffineNormalizerModelParameters<TData>)col?.GetNormalizerModelParams();
                 onFit(aCol.Scale, aCol.Offset);
             };
         }
@@ -323,7 +322,7 @@ namespace Microsoft.ML.Runtime.Data
                 return null;
             return col =>
             {
-                var aCol = (NormalizingTransformer.ICdfData<TData>)col;
+                var aCol = (NormalizingTransformer.CdfNormalizerModelParameters<TData>)col?.GetNormalizerModelParams();
                 onFit(aCol.Mean, aCol.Stddev);
             };
         }
@@ -335,7 +334,7 @@ namespace Microsoft.ML.Runtime.Data
                 return null;
             return col =>
             {
-                var aCol = (NormalizingTransformer.IBinData<TData>)col;
+                var aCol = (NormalizingTransformer.BinNormalizerModelParameters<TData>)col?.GetNormalizerModelParams();
                 onFit(aCol.UpperBounds);
             };
         }

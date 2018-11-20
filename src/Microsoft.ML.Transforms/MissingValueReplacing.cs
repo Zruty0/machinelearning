@@ -290,13 +290,14 @@ namespace Microsoft.ML.Transforms
             VBufferUtils.Densify<T>(ref src);
             InPredicate<T> defaultPred = Runtime.Data.Conversion.Conversions.Instance.GetIsDefaultPredicate<T>(srcType.ItemType);
             _repIsDefault[iinfo] = new BitArray(srcType.VectorSize);
-            for (int slot = 0; slot < src.Length; slot++)
+            var srcValues = src.GetValues();
+            for (int slot = 0; slot < srcValues.Length; slot++)
             {
-                if (defaultPred(in src.Values[slot]))
+                if (defaultPred(in srcValues[slot]))
                     _repIsDefault[iinfo][slot] = true;
             }
-            T[] valReturn = src.Values;
-            Array.Resize<T>(ref valReturn, srcType.VectorSize);
+            // copy the result array out. Copying is OK because this method is only called on model load.
+            T[] valReturn = srcValues.ToArray();
             Host.Assert(valReturn.Length == src.Length);
             return valReturn;
         }
@@ -559,7 +560,7 @@ namespace Microsoft.ML.Transforms
 
         protected override IRowMapper MakeRowMapper(Schema schema) => new Mapper(this, schema);
 
-        private sealed class Mapper : MapperBase, ISaveAsOnnx
+        private sealed class Mapper : OneToOneMapperBase, ISaveAsOnnx
         {
             private sealed class ColInfo
             {
@@ -630,7 +631,7 @@ namespace Microsoft.ML.Transforms
                 return infos;
             }
 
-            public override ColumnHeader[] GetOutputColumns()
+            public override ColumnHeader[] GetOutputColumnsCore()
             {
                 var result = new ColumnHeader[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
@@ -644,7 +645,7 @@ namespace Microsoft.ML.Transforms
                 return result;
             }
 
-            protected override Delegate MakeGetter(IRow input, int iinfo, out Action disposer)
+            protected override Delegate MakeGetter(IRow input, int iinfo, Func<int, bool> activeOutput, out Action disposer)
             {
                 Host.AssertValue(input);
                 Host.Assert(0 <= iinfo && iinfo < _infos.Length);
@@ -738,12 +739,10 @@ namespace Microsoft.ML.Transforms
                 var srcValues = src.GetValues();
                 int srcCount = srcValues.Length;
 
-                var dstValues = dst.Values;
-                var dstIndices = dst.Indices;
-
-                // If the values array is not large enough, allocate sufficient space.
-                // Note: We can't set the max to srcSize as vectors can be of variable lengths.
-                Utils.EnsureSize(ref dstValues, srcCount, keepOld: false);
+                // REVIEW: One thing that changing the code to simply ensure that there are srcCount indices in the arrays
+                // does is over-allocate space if the replacement value is the default value in a dataset with a
+                // signficiant amount of NA values -- is it worth handling allocation of memory for this case?
+                var dstEditor = VBufferEditor.Create(ref dst, srcSize, srcCount);
 
                 int iivDst = 0;
                 if (src.IsDense)
@@ -760,7 +759,7 @@ namespace Microsoft.ML.Transforms
                         // the default value, resulting in more than half of the indices being the default value.
                         // In this case, changing the dst vector to be sparse would be more memory efficient -- the current decision
                         // is it is not worth handling this case at the expense of running checks that will almost always not be triggered.
-                        dstValues[ivSrc] = isNA(in srcVal) ? rep : srcVal;
+                        dstEditor.Values[ivSrc] = isNA(in srcVal) ? rep : srcVal;
                     }
                     iivDst = srcCount;
                 }
@@ -769,12 +768,6 @@ namespace Microsoft.ML.Transforms
                     // The source vector is sparse.
                     Host.Assert(srcCount < srcSize);
                     var srcIndices = src.GetIndices();
-
-                    // Allocate more space if necessary.
-                    // REVIEW: One thing that changing the code to simply ensure that there are srcCount indices in the arrays
-                    // does is over-allocate space if the replacement value is the default value in a dataset with a
-                    // signficiant amount of NA values -- is it worth handling allocation of memory for this case?
-                    Utils.EnsureSize(ref dstIndices, srcCount, keepOld: false);
 
                     // Note: ivPrev is only used for asserts.
                     int ivPrev = -1;
@@ -788,21 +781,21 @@ namespace Microsoft.ML.Transforms
 
                         if (!isNA(in srcVal))
                         {
-                            dstValues[iivDst] = srcVal;
-                            dstIndices[iivDst++] = iv;
+                            dstEditor.Values[iivDst] = srcVal;
+                            dstEditor.Indices[iivDst++] = iv;
                         }
                         else if (!repIsDefault)
                         {
                             // Allow for further sparsification.
-                            dstValues[iivDst] = rep;
-                            dstIndices[iivDst++] = iv;
+                            dstEditor.Values[iivDst] = rep;
+                            dstEditor.Indices[iivDst++] = iv;
                         }
                     }
                     Host.Assert(iivDst <= srcCount);
                 }
                 Host.Assert(0 <= iivDst);
                 Host.Assert(repIsDefault || iivDst == srcCount);
-                dst = new VBuffer<T>(srcSize, iivDst, dstValues, dstIndices);
+                dst = dstEditor.CommitTruncated(iivDst);
             }
 
             /// <summary>
@@ -820,11 +813,10 @@ namespace Microsoft.ML.Transforms
                 var srcValues = src.GetValues();
                 int srcCount = srcValues.Length;
 
-                var dstValues = dst.Values;
-                var dstIndices = dst.Indices;
-
-                // If the values array is not large enough, allocate sufficient space.
-                Utils.EnsureSize(ref dstValues, srcCount, srcSize, keepOld: false);
+                // REVIEW: One thing that changing the code to simply ensure that there are srcCount indices in the arrays
+                // does is over-allocate space if the replacement value is the default value in a dataset with a
+                // signficiant amount of NA values -- is it worth handling allocation of memory for this case?
+                var dstEditor = VBufferEditor.Create(ref dst, srcSize, srcCount);
 
                 int iivDst = 0;
                 if (src.IsDense)
@@ -841,7 +833,7 @@ namespace Microsoft.ML.Transforms
                         // the default value, resulting in more than half of the indices being the default value.
                         // In this case, changing the dst vector to be sparse would be more memory efficient -- the current decision
                         // is it is not worth handling this case at the expense of running checks that will almost always not be triggered.
-                        dstValues[ivSrc] = isNA(in srcVal) ? rep[ivSrc] : srcVal;
+                        dstEditor.Values[ivSrc] = isNA(in srcVal) ? rep[ivSrc] : srcVal;
                     }
                     iivDst = srcCount;
                 }
@@ -850,12 +842,6 @@ namespace Microsoft.ML.Transforms
                     // The source vector is sparse.
                     Host.Assert(srcCount < srcSize);
                     var srcIndices = src.GetIndices();
-
-                    // Allocate more space if necessary.
-                    // REVIEW: One thing that changing the code to simply ensure that there are srcCount indices in the arrays
-                    // does is over-allocate space if the replacement value is the default value in a dataset with a
-                    // signficiant amount of NA values -- is it worth handling allocation of memory for this case?
-                    Utils.EnsureSize(ref dstIndices, srcCount, srcSize, keepOld: false);
 
                     // Note: ivPrev is only used for asserts.
                     int ivPrev = -1;
@@ -869,20 +855,20 @@ namespace Microsoft.ML.Transforms
 
                         if (!isNA(in srcVal))
                         {
-                            dstValues[iivDst] = srcVal;
-                            dstIndices[iivDst++] = iv;
+                            dstEditor.Values[iivDst] = srcVal;
+                            dstEditor.Indices[iivDst++] = iv;
                         }
                         else if (!repIsDefault[iv])
                         {
                             // Allow for further sparsification.
-                            dstValues[iivDst] = rep[iv];
-                            dstIndices[iivDst++] = iv;
+                            dstEditor.Values[iivDst] = rep[iv];
+                            dstEditor.Indices[iivDst++] = iv;
                         }
                     }
                     Host.Assert(iivDst <= srcCount);
                 }
                 Host.Assert(0 <= iivDst);
-                dst = new VBuffer<T>(srcSize, iivDst, dstValues, dstIndices);
+                dst = dstEditor.CommitTruncated(iivDst);
             }
 
             public void SaveAsOnnx(OnnxContext ctx)

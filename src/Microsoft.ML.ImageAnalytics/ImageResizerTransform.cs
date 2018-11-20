@@ -293,7 +293,7 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
                 throw Host.ExceptSchemaMismatch(nameof(inputSchema), "input", _columns[col].Input, "image", inputSchema.GetColumnType(srcCol).ToString());
         }
 
-        private sealed class Mapper : MapperBase
+        private sealed class Mapper : OneToOneMapperBase
         {
             private readonly ImageResizerTransform _parent;
 
@@ -303,10 +303,10 @@ namespace Microsoft.ML.Runtime.ImageAnalytics
                 _parent = parent;
             }
 
-            public override ColumnHeader[] GetOutputColumns()
-                => _parent._columns.Select(x => new ML.Data.ColumnHeader(x.Output, x.Type, null)).ToArray();
+            public override ColumnHeader[] GetOutputColumnsCore()
+                => _parent._columns.Select(x => new ColumnHeader(x.Output, x.Type, null)).ToArray();
 
-            protected override Delegate MakeGetter(IRow input, int iinfo, out Action disposer)
+            protected override Delegate MakeGetter(IRow input, int iinfo, Func<int, bool> activeOutput, out Action disposer)
             {
                 Contracts.AssertValue(input);
                 Contracts.Assert(0 <= iinfo && iinfo < _parent._columns.Length);

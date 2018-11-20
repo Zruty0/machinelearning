@@ -423,7 +423,7 @@ namespace Microsoft.ML.Transforms.Projections
 
         protected override IRowMapper MakeRowMapper(Schema schema) => new Mapper(this, Schema.Create(schema));
 
-        private sealed class Mapper : MapperBase
+        private sealed class Mapper : OneToOneMapperBase
         {
             private readonly ColumnType[] _srcTypes;
             private readonly int[] _srcCols;
@@ -446,7 +446,7 @@ namespace Microsoft.ML.Transforms.Projections
                 }
             }
 
-            public override ColumnHeader[] GetOutputColumns()
+            public override ColumnHeader[] GetOutputColumnsCore()
             {
                 var result = new ColumnHeader[_parent.ColumnPairs.Length];
                 for (int i = 0; i < _parent.ColumnPairs.Length; i++)
@@ -460,7 +460,7 @@ namespace Microsoft.ML.Transforms.Projections
                 return result;
             }
 
-            protected override Delegate MakeGetter(IRow input, int iinfo, out Action disposer)
+            protected override Delegate MakeGetter(IRow input, int iinfo, Func<int, bool> activeOutput, out Action disposer)
             {
                 Contracts.AssertValue(input);
                 Contracts.Assert(0 <= iinfo && iinfo < _parent.ColumnPairs.Length);

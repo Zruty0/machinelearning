@@ -64,6 +64,8 @@ namespace Microsoft.ML.Runtime.Data
         bool CanSaveOnnx(OnnxContext ctx);
 
         bool OnnxInfo(OnnxContext ctx, OnnxNode nodeProtoWrapper, int featureCount);
+
+        NormalizingTransformer.NormalizerModelParametersBase GetNormalizerModelParams();
     }
 
     public static class NormalizeUtils

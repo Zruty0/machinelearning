@@ -161,7 +161,7 @@ namespace Microsoft.ML.Transforms
         protected override IRowMapper MakeRowMapper(Schema inputSchema)
             => new Mapper(this, inputSchema, ColumnPairs);
 
-        private sealed class Mapper : MapperBase, ISaveAsOnnx
+        private sealed class Mapper : OneToOneMapperBase, ISaveAsOnnx
         {
             private readonly Schema _schema;
             private readonly (string Source, string Name)[] _columns;
@@ -175,7 +175,7 @@ namespace Microsoft.ML.Transforms
                 _columns = columns;
             }
 
-            protected override Delegate MakeGetter(IRow input, int iinfo, out Action disposer)
+            protected override Delegate MakeGetter(IRow input, int iinfo, Func<int, bool> activeOutput, out Action disposer)
             {
                 Host.AssertValue(input);
                 Host.Assert(0 <= iinfo && iinfo < _columns.Length);

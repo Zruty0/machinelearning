@@ -393,7 +393,7 @@ namespace Microsoft.ML.Transforms.Conversions
             return true;
         }
 
-        private sealed class Mapper : MapperBase, ICanSaveOnnx
+        private sealed class Mapper : OneToOneMapperBase, ICanSaveOnnx
         {
             private readonly TypeConvertingTransformer _parent;
             private readonly ColumnType[] _types;
@@ -442,7 +442,7 @@ namespace Microsoft.ML.Transforms.Conversions
                 return true;
             }
 
-            public override ColumnHeader[] GetOutputColumns()
+            public override ColumnHeader[] GetOutputColumnsCore()
             {
                 var result = new ColumnHeader[_parent._columns.Length];
                 for (int i = 0; i < _parent._columns.Length; i++)
@@ -468,7 +468,7 @@ namespace Microsoft.ML.Transforms.Conversions
                 return result;
             }
 
-            protected override Delegate MakeGetter(IRow input, int iinfo, out Action disposer)
+            protected override Delegate MakeGetter(IRow input, int iinfo, Func<int, bool> activeOutput, out Action disposer)
             {
                 Contracts.AssertValue(input);
                 Contracts.Assert(0 <= iinfo && iinfo < _parent.ColumnPairs.Length);
