@@ -119,19 +119,13 @@ namespace Microsoft.ML.Data
         /// Returns a standard exception for responding to an invalid call to GetMetadata.
         /// </summary>
         [BestFriend]
-        internal static Exception ExceptGetMetadata()
-        {
-            return Contracts.Except("Invalid call to GetMetadata");
-        }
+        internal static Exception ExceptGetMetadata() => Contracts.Except("Invalid call to GetMetadata");
 
         /// <summary>
         /// Returns a standard exception for responding to an invalid call to GetMetadata.
         /// </summary>
         [BestFriend]
-        internal static Exception ExceptGetMetadata(this IExceptionContext ctx)
-        {
-            return ctx.Except("Invalid call to GetMetadata");
-        }
+        internal static Exception ExceptGetMetadata(this IExceptionContext ctx) => ctx.Except("Invalid call to GetMetadata");
 
         /// <summary>
         /// Helper to marshal a call to GetMetadata{TValue} to a specific type.
@@ -374,6 +368,10 @@ namespace Microsoft.ML.Data
         /// </summary>
         public static bool IsNormalized(this Schema.Column column)
         {
+            var metaColumn = column.Metadata.Schema.GetColumnOrNull((Kinds.IsNormalized));
+            if (metaColumn == null || !metaColumn.Value.Type.IsBool)
+                return false;
+
             bool value = default;
             column.Metadata.GetValue(Kinds.IsNormalized, ref value);
             return value;
